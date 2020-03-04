@@ -17,14 +17,16 @@ from fractions import *
 
 // Functions about preceeding and suceeding elements
 function get_peer_index(target_element) {
-    peers = target_element.getPeers()
-    i = 0
-    for element in peers:
-        if element == target_element:
-            index = i
-            break
-        i += 1
-    return [index, peers]
+    var i, peers, element, index;
+    i = 0; peers = target_element.getPeers();
+    for (element of peers) {
+        if (element == target_element) {
+            index = i;
+            break;
+        }
+        i += 1;
+    }
+    return [index, peers];
 }
 
 function get_next_element(target_element) {
