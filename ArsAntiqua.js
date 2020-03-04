@@ -12,8 +12,8 @@ Ars Antiqua is characterized by the following:
    Therefore, there is no issue regarding the distiction between dot's functionality (division vs. augmentation).
    In other words, in Ars antiqua, all dots are dots of division.
 */
-from pymei import *
-from fractions import *
+//from pymei import *//
+//from fractions import *//
 
 // Functions about preceeding and suceeding elements
 function get_peer_index(target_element) {
@@ -30,21 +30,31 @@ function get_peer_index(target_element) {
 }
 
 function get_next_element(target_element) {
-    [index, peers] = get_peer_index(target_element)
-    try:
-        next_element = peers[index + 1]
-    except:
-        next_element = None
-    return next_element
+    var ind_peers, index, peers, next_element;
+    ind_peers = get_peer_index(target_element);
+    index = ind_peers[0];
+    peers = ind_peers[1];
+    try {
+        next_element = peers[index + 1];
+    }
+    catch(err) {
+        next_element = None;
+    }
+    return next_element;
 }
 
 function get_preceding_element(target_element) {
-    [index, peers] = get_peer_index(target_element)
-    try:
-        preceding_element = peers[index - 1]
-    except:
-        preceding_element = None
-    return preceding_element
+    var ind_peers, index, peers, preceding_element;
+    ind_peers = get_peer_index(target_element);
+    index = ind_peers[0];
+    peers = ind_peers[1];
+    try {
+        preceding_element = peers[index - 1];
+    }
+    catch(err) {
+        preceding_element = None;
+    }
+    return preceding_element;
 }
 
 function get_preceding_noterest(target_element) {
