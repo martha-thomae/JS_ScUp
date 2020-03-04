@@ -16,7 +16,7 @@ from pymei import *
 from fractions import *
 
 // Functions about preceeding and suceeding elements
-def get_peer_index(target_element):
+function get_peer_index(target_element) {
     peers = target_element.getPeers()
     i = 0
     for element in peers:
@@ -25,31 +25,35 @@ def get_peer_index(target_element):
             break
         i += 1
     return [index, peers]
+}
 
-def get_next_element(target_element):
+function get_next_element(target_element) {
     [index, peers] = get_peer_index(target_element)
     try:
         next_element = peers[index + 1]
     except:
         next_element = None
     return next_element
+}
 
-def get_preceding_element(target_element):
+function get_preceding_element(target_element) {
     [index, peers] = get_peer_index(target_element)
     try:
         preceding_element = peers[index - 1]
     except:
         preceding_element = None
     return preceding_element
+}
 
-def get_preceding_noterest(target_element):
+function get_preceding_noterest(target_element) {
     preceeding_element = get_preceding_element(target_element)
     while preceeding_element.name != 'note' and preceeding_element.name != 'rest':
         preceeding_element = get_preceding_element(preceeding_element)
     return preceeding_element
+}
 
 // Functions related to the counting of minims in a sequence of notes
-def counting_semibreves(sequence_of_notes, note_durs, undotted_note_gain):
+function counting_semibreves(sequence_of_notes, note_durs, undotted_note_gain) {
     sb_counter = 0
     print ""
     for note in sequence_of_notes:
@@ -67,13 +71,15 @@ def counting_semibreves(sequence_of_notes, note_durs, undotted_note_gain):
         sb_counter += gain
         print(dur + ", " + str(gain) + ", " + str(sb_counter))
     return sb_counter
+}
 
-def has_been_modified(note):
+function has_been_modified(note) {
     return (note.hasAttribute('num') and note.hasAttribute('numbase'))
+}
 
 // Given the total amount of "breves" in-between the "longs", see if they can be arranged in groups of 3
 // According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-def modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note):
+function modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note) {
     // 1 breve left out:
     if counter % 3 == 1:
         // Default Case
@@ -222,8 +228,9 @@ def modification(counter, start_note, middle_notes, end_note, following_note, sh
             else:
                 // Start note remains perfect
                 pass
+}
 
-def modification_semibreve_level(middle_notes):
+function modification_semibreve_level(middle_notes) {
     // If there are 3 semibreves:
     counter = len(middle_notes)
     if counter == 3:
@@ -251,8 +258,9 @@ def modification_semibreve_level(middle_notes):
         for note in middle_notes:
             note.addAttribute('num', str(counter))
             note.addAttribute('numbase', '3')
+}
 
-def breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain):
+function breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain) {
     // Total of breves in the middle_notes        
     // 1. Pre-processing: Filtering. Remove the 'dot' elements (and other group markings, such as 'Group_Begin' and 'Group_End')
     // from the middle_notes list, so that this list only contains notes and rests that lie between the longs.
@@ -265,9 +273,10 @@ def breves_between_longas(start_note, middle_notes, end_note, following_note, te
     count_B = sb_counter / tempus
     
     modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa')
+}
 
 // Main function
-def lining_up(quasiscore_mensural_doc):
+function lining_up(quasiscore_mensural_doc) {
     // For each voice (staff element) in the "score"
     staves = quasiscore_mensural_doc.getElementsByName('staff')
     stavesDef = quasiscore_mensural_doc.getElementsByName('staffDef')
@@ -392,3 +401,4 @@ def lining_up(quasiscore_mensural_doc):
             pass
 
     return quasiscore_mensural_doc
+}
