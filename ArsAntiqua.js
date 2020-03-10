@@ -16,7 +16,6 @@
        In other words, in Ars antiqua, all dots are dots of division.
 */
 const Fraction = require('fraction.js');
-const { JSDOM } = require('jsdom');
 
 // Functions about preceeding and suceeding elements
 function get_preceding_noterest(target_element) {
@@ -281,7 +280,7 @@ function modification_semibreve_level(middle_notes) {
 }
 
 function breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain) {
-    // Total of breves in the middle_notes        
+    // Total of breves in the middle_notes
     // 1. Pre-processing: Filtering. Remove the 'dot' elements (and other group markings, such as 'Group_Begin' and 'Group_End')
     // from the middle_notes list, so that this list only contains notes and rests that lie between the longs.
     var sequence_of_middle_notes = [];
@@ -296,7 +295,7 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     var count_B = sb_counter / tempus;
     console.log(count_B);
     console.log();
-    
+
     modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa');
 }
 
@@ -339,7 +338,7 @@ const lining_up = quasiscore_mensural_doc => {
             } else if (name == 'ligature') {
                 console.log("Got a ligature!");
                 // The Group_Begin and Group_End elements introduced here are just place holders, a way to indicate that the
-                // set of notes between these two elements belong to the same grouping 
+                // set of notes between these two elements belong to the same grouping
                 //(Maybe I can use just a new element <dot> for that? These elments are not getting exported to the output file, so it should be fine.)
                 voice_noterest_dots_content.push(quasiscore_mensural_doc.createElementNS('http://www.music-encoding.org/ns/mei', 'Group_Begin'));
                 for (var child of element.children){
