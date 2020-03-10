@@ -311,11 +311,18 @@ function lining_up(quasiscore_mensural_doc) {
         // Getting the mensuration information of the voice (prolatio is irrelevant in Ars antiqua)
         var tempus = staffDef.getAttribute('tempus');
         var modusminor = staffDef.getAttribute('modusminor');
-        var modusmaior = staffDef.getAttribute('modusmaior');
+
+        // If there is no @tempus attribute in the <staffDef>, give the variable tempus a default value of 3.
+        // The missing @tempus attribute in a voice represents the lack of semibreves that voice.
+        // Therefore, the default value of the variable tempus can be either 2 or 3 (here I decided on 3).
+        if (tempus == null){tempus = 3;}
 
         // Individual note values and gains, according to the mensuration
         var note_durs = ['semibrevis', 'brevis', 'longa', 'maxima'];
-        var undotted_note_gain = [1, 1*tempus, modusminor * tempus, modusmaior * modusminor * tempus];
+        var undotted_note_gain = [1, 1*tempus, modusminor * tempus];
+        console.log(note_durs);
+        console.log(undotted_note_gain);
+        console.log();
 
         // Getting all the relevant elements of a staff into a python list (in order of appearance).
         // The relevant elements (for Ars antiqua) are notes, rests, dots, and other group markings (such as ligatures).
