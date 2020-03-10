@@ -1,17 +1,19 @@
 /*
-DURATION FINDER MODULE FOR ARS ANTIQUA
-Ars Antiqua is characterized by the following:
-1. Absence of 'minims'
-2. Absence of 'prolatio'
-3. The 'breve' can't be identified as 'perfect' or 'imperfect'.
-   It is just considered to be equal to 3 minor semibreves, or a pair of minor-major semibreves,
-   or it is equal to 2 equal-duration semibreves.
-4. The fact that the 'breve' can't be catalogued as 'perfect' or 'imperfect', implies that the 'semibreve' can't be 'altered.
-   It just can be 'maior' or 'minor'.
-5. There are no 'maximas' just 'duplex longas'
-6. There is no dot of augmentation (this was introduced in the Ars nova). 
-   Therefore, there is no issue regarding the distiction between dot's functionality (division vs. augmentation).
-   In other words, in Ars antiqua, all dots are dots of division.
+    DURATION FINDER MODULE FOR ARS ANTIQUA
+    Figure out the duration of the notes in the individual <staff> elements.
+
+    Ars Antiqua is characterized by the following:
+    1. Absence of 'minims'
+    2. Absence of 'prolatio' and 'modusmaior'
+    3. The 'breve' can't be identified as 'perfect' or 'imperfect'.
+       It is just considered to be equal to 3 minor semibreves, or a pair of minor-major semibreves,
+       or it is equal to 2 equal-duration semibreves.
+    4. The fact that the 'breve' can't be catalogued as 'perfect' or 'imperfect', implies that the 'semibreve' can't be 'altered.
+       It just can be 'maior' or 'minor'.
+    5. There are no 'maximas' just 'duplex longas'
+    6. There is no dot of augmentation (this was introduced in the Ars nova).
+       Therefore, there is no issue regarding the distiction between dot's functionality (division vs. augmentation).
+       In other words, in Ars antiqua, all dots are dots of division.
 */
 const Fraction = require('fraction.js');
 const { JSDOM } = require('jsdom');
@@ -299,7 +301,7 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
 }
 
 // Main function
-function lining_up(quasiscore_mensural_doc) {
+const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
     var staves = quasiscore_mensural_doc.getElementsByTagName('staff');
     var stavesDef = quasiscore_mensural_doc.getElementsByTagName('staffDef');
@@ -379,7 +381,7 @@ function lining_up(quasiscore_mensural_doc) {
             if (!(list_of_indices_geq_B_and_dots.includes(0)) && list_of_indices_geq_B_and_dots.length != 0) {
                 f = list_of_indices_geq_B_and_dots[0];
                 middle_notes = voice_noterest_dots_content.slice(0,f);
-                /*///DEBUG:
+                /*//DEBUG:
                 var m = "";
                 for (var midnote of middle_notes){
                     m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
@@ -461,4 +463,6 @@ function lining_up(quasiscore_mensural_doc) {
         }
     }
     return quasiscore_mensural_doc;
-}
+};
+
+exports.lining_up = lining_up;
