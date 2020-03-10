@@ -1,0 +1,25 @@
+{
+  "name": "scoring-up",
+  "version": "1.0.0",
+  "description": "The scoring-up script takes a finite number of Mensural MEI files, each of which only contains one part (i.e., voice) from a mensural piece and merge them into just one Mensural MEI file in which all the parts are lined up into a score. The alignment of the parts is a complex issue in mensural notation, since the same note-shape can have different durational values (_perfect_ / _imperfect_ / _altered_) depending on the context.",
+  "main": "entry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martha-thomae/JS_ScUp.git"
+  },
+  "author": "Martha Thomae",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/martha-thomae/JS_ScUp/issues"
+  },
+  "homepage": "https://github.com/martha-thomae/JS_ScUp#readme",
+  "dependencies": {
+    "fraction.js": "^4.0.12"
+  },
+  "devDependencies": {
+    "jsdom": "^16.2.1"
+  }
+}
