@@ -36,6 +36,12 @@ const merge = meiDoc => {
         section.appendChild(staff);
     }
 
+    // Change value of @n in each <staff> and <staffDef> elements
+    for (var i = 1; i < (staves.length + 1); i++){
+        staves[i-1].setAttribute('n', ''+i);
+        stavesDef[i-1].setAttribute('n', ''+i);
+    }
+
     // Clean up: remove <parts>
     mdiv.removeChild(mei.getElementsByTagName('parts')[0]);
 

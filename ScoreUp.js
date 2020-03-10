@@ -87,8 +87,8 @@ var inputMeiString = '<mei xmlns="http://www.music-encoding.org/ns/mei" meiversi
 '<dot xml:id="m-8d39c4c8-86aa-479e-b873-ad70604e8fd8"/><note xml:id="m-65f9c934-d03a-416a-8320-98105d9a96c0" dur="semibrevis" oct="4" pname="g"/>' + 
 '<note xml:id="m-f129dd10-f77b-478c-b581-c35606981e25" dur="semibrevis" oct="4" pname="g"/><note xml:id="m-101d98f9-761f-4cb2-b884-31e8121b2c02" dur="brevis" oct="4" pname="e"/>' + 
 '<note xml:id="m-508d272a-9132-45d4-97e1-e75970b632b9" dur="longa" oct="4" pname="f"/></layer>' + 
-'</staff></section></part><part><scoreDef><staffGrp><staffDef n="2" lines="5" notationtype="mensural.black" notationsubtype="Ars antiqua" label="motetus" modusminor="3" tempus="3"/>' + 
-'</staffGrp></scoreDef><section><staff n="2"><layer><pb facs="#m-62b752be-ffe1-4350-8928-6200a7b3937f"/><sb facs="#m-0a833f76-7280-42e1-8aed-d4584ed99891"/>' + 
+'</staff></section></part><part><scoreDef><staffGrp><staffDef n="1" lines="5" notationtype="mensural.black" notationsubtype="Ars antiqua" label="motetus" modusminor="3" tempus="3"/>' + 
+'</staffGrp></scoreDef><section><staff n="1"><layer><pb facs="#m-62b752be-ffe1-4350-8928-6200a7b3937f"/><sb facs="#m-0a833f76-7280-42e1-8aed-d4584ed99891"/>' + 
 '<clef xml:id="m-fbcca465-8bbb-4707-b17c-b26e526ba8ef" shape="C" line="3"/><note xml:id="m-a96e0e06-532a-486f-a47b-5decd3a6fa53" dur="longa" oct="4" pname="g"/>' + 
 '<note xml:id="m-c3cf0979-7e2f-46f8-80b3-24012b051675" dur="semibrevis" oct="4" pname="f"/><note xml:id="m-b6f00694-6b22-4441-880f-313fdef34531" dur="semibrevis" oct="4" pname="e"/>' + 
 '<note xml:id="m-63f57719-91b2-4085-a783-417ee5b623bd" dur="semibrevis" oct="4" pname="d"/><note xml:id="m-ec3b1ca5-5881-4469-aa31-67cce9d26a3b" dur="longa" oct="4" pname="c"/>' + 
@@ -142,7 +142,7 @@ var inputMeiString = '<mei xmlns="http://www.music-encoding.org/ns/mei" meiversi
 '<ligature xml:id="m-3cc05f59-f460-4c60-930c-6289e8ced562"><note xml:id="m-afb6daf1-fde4-42fa-a8ca-5cda3df29361" dur="semibrevis" oct="4" pname="c"/>' + 
 '<note xml:id="m-33830b1f-964a-46ac-b8ae-367e37f43da5" dur="semibrevis" oct="3" pname="b"/></ligature><note xml:id="m-22579bdd-0c7b-422f-8345-cac2bf7244e4" dur="longa" oct="4" pname="c"/>' + 
 '<rest xml:id="m-b3fd350f-0f74-44f0-be08-6e1f8b6298c8" dur="brevis"/></layer></staff></section></part><part><scoreDef><staffGrp>' + 
-'<staffDef n="3" lines="5" notationtype="mensural.black" notationsubtype="Ars antiqua" label="tenor" modusminor="3"/></staffGrp></scoreDef><section><staff n="3"><layer>' + 
+'<staffDef n="1" lines="5" notationtype="mensural.black" notationsubtype="Ars antiqua" label="tenor" modusminor="3"/></staffGrp></scoreDef><section><staff n="1"><layer>' + 
 '<pb facs="#m-62b752be-ffe1-4350-8928-6200a7b3937f"/><sb facs="#m-8d38795d-3aec-4c6c-ba77-6415f9a77f84"/>' + 
 '<clef xml:id="m-abd45e78-95e6-4284-a59d-c49447fba03c" shape="C" line="3"/><rest xml:id="m-8d37b0c4-10db-4be2-b5b6-cda00f9f1fa8" dur="brevis"/>' + 
 '<note xml:id="m-fd2ba66d-ac82-41a6-ab8d-ac244e2acd5d" dur="longa" oct="4" pname="c"/><note xml:id="m-5e74db5d-ca75-4e37-a3c4-bb1a54a71cec" dur="brevis" oct="3" pname="b"/>' + 
