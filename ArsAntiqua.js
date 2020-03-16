@@ -334,8 +334,12 @@ const lining_up = quasiscore_mensural_doc => {
         var voice_noterest_dots_content = [];
         for (var element of voice_content){
             var name = element.tagName;
-            if (name == 'note' || name == 'rest' || name == 'dot') {
+            if (name == 'note' || name == 'rest') {
                 voice_noterest_dots_content.push(element);
+            } else if (name == 'dot') {
+                voice_noterest_dots_content.push(element);
+                // Also encode the dot's functionality (i.e., division)
+                element.setAttribute('form', 'div');
             } else if (name == 'ligature') {
                 console.log("Got a ligature!");
                 // The Group_Begin and Group_End elements introduced here are just place holders, a way to indicate that the
