@@ -17,21 +17,28 @@ function cleanup(meiDoc) {
     }
 }
 
-function clef_definition(staff) {
-    // Remove <clef> elements of a voice (i.e., <staff>) other than the first one (initialClef)
-    // Except if these following <clef> elements encode a change in clef.
+function clef_definition(staff, staffDef) {
+    // Remove all <clef> elements of a voice (i.e., <staff>),
+    // except if they encode a change in clef.
     const clefs = Array.from(staff.getElementsByTagName('clef'));
     const initialClef = clefs[0];
     const initialClef_line = initialClef.getAttribute('line');
     const initialClef_shape = initialClef.getAttribute('shape');
     var parent;
-    for (var i = 1; i < clefs.length; i ++) {
+    for (var i = 0; i < clefs.length; i ++) {
         var clef = clefs[i];
         // If the i-th <clef> element encodes the same clef as
         // the one at the beginning of the voice, remove it.
         if (clef.getAttribute('line') == initialClef_line && clef.getAttribute('shape') == initialClef_shape) {
             parent = clef.parentElement;
             parent.removeChild(clef);
+        }
+    }
+    // Encode the first clef of the voice (initialClef) within <staffDef>
+    for (var attribute_name of initialClef.getAttributeNames()){
+        if (attribute_name != 'xml:id') {
+            var attribute_value = initialClef.getAttribute(attribute_name);
+            staffDef.setAttribute('clef.'+attribute_name, attribute_value);
         }
     }
 }
@@ -68,19 +75,23 @@ const merge = meiDoc => {
         section.appendChild(staff);
     }
 
-    // Change value of @n in each <staff> and <staffDef> elements
-    for (var i = 1; i < (staves.length + 1); i++){
-        staves[i-1].setAttribute('n', ''+i);
-        stavesDef[i-1].setAttribute('n', ''+i);
-    }
-
     // Clean Up:
     // Remove <parts>
     mdiv.removeChild(mei.getElementsByTagName('parts')[0]);
     // Remove extraneous elements: <pb> and <sb>
     cleanup(meiDoc);
-    // Remove extra <clef> elements for each voice (i.e., <staff>)
-    for (staff of staves){clef_definition(staff);}
+    // Move attributes or modify their values (given the new <score>-based structure):
+    // @n and clef-related attributes
+    for (var i = 0; i < staves.length; i++){
+        staff = staves[i];
+        staffDef = stavesDef[i];
+        // Change value of @n in each <staff> and <staffDef> elements
+        staff.setAttribute('n', i+1+'');
+        staffDef.setAttribute('n', i+1+'');
+        // Remove unnecesary <clef> elements in the voice (i.e., <staff>) and
+        // Encode inital clef within the voice's metadata (i.e., <staffDef> attributes)
+        clef_definition(staff, staffDef);
+    }
 
     return meiDoc;
 };
