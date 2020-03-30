@@ -299,6 +299,31 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa');
 }
 
+function replace_ligatures_by_brackets(meiDoc){
+    // Retrieve all ligatures
+    const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
+    // For each ligature
+    for (ligature of ligatures) {
+        // 1. Take the notes contained within that <ligature>
+        // and incorporate them into the stream of notes of the <layer>
+        var parent = ligature.parentElement;
+        var ligated_notes = Array.from(ligature.children);
+        for (note of ligated_notes) {
+            parent.insertBefore(note, ligature);
+        }
+        // 2. Substitute the <ligature> for a <bracketSpan> element
+        // Create the <bracketSpan> element to replace the ligature
+        var bracketSpan = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'bracketSpan');
+        bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
+        parent.replaceChild(bracketSpan, ligature);
+        // With @startid and @endid pointing to the start and end of the ligature
+        var start_note = ligated_notes[0];
+        var end_note = ligated_notes[ligated_notes.length - 1];
+        bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
+        bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
+    }
+}
+
 // Main function
 const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
@@ -465,6 +490,9 @@ const lining_up = quasiscore_mensural_doc => {
             // modusminor = 2
         }
     }
+
+    replace_ligatures_by_brackets(quasiscore_mensural_doc);
+
     return quasiscore_mensural_doc;
 };
 
