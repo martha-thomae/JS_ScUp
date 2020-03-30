@@ -93,7 +93,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
         case 2: // 2 breves left out:
             // One of he possibilities when 2 breves are left out, is alteration.
             // One must alter the last (uncolored) note from the middle_notes of the sequence
-            last_middle_note = middle_notes[-1];
+            last_middle_note = middle_notes[middle_notes.length - 1];
             // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
             last_uncolored_note = last_middle_note;
             // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
