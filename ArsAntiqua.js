@@ -321,6 +321,9 @@ function replace_ligatures_by_brackets(meiDoc){
         var end_note = ligated_notes[ligated_notes.length - 1];
         bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
         bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
+        // And with attributes corresponding to a mensural ligature
+        bracketSpan.setAttribute('func', 'ligature');
+        bracketSpan.setAttribute('lform', 'solid');
     }
 }
 
