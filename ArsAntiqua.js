@@ -303,12 +303,12 @@ function replace_ligatures_by_brackets(meiDoc){
     // Retrieve all ligatures
     const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
     // For each ligature
-    for (ligature of ligatures) {
+    for (var ligature of ligatures) {
         // 1. Take the notes contained within that <ligature>
         // and incorporate them into the stream of notes of the <layer>
         var parent = ligature.parentElement;
         var ligated_notes = Array.from(ligature.children);
-        for (note of ligated_notes) {
+        for (var note of ligated_notes) {
             parent.insertBefore(note, ligature);
         }
         // 2. Substitute the <ligature> for a <bracketSpan> element
