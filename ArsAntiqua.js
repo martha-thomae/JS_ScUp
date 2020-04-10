@@ -384,11 +384,31 @@ const lining_up = quasiscore_mensural_doc => {
                     }
                 }
                 voice_noterest_dots_content.push(quasiscore_mensural_doc.createElementNS('http://www.music-encoding.org/ns/mei', 'Group_End'));
+            } else if (name == 'choice'){
+                var corr = element.getElementsByTagName('corr')[0];
+                for (var child of corr.children) {
+                    if (child.tagName == 'note' || child.tagName == 'rest') {
+                        voice_noterest_dots_content.push(child);
+                    } else if (child.tagName == 'dot') {
+                        voice_noterest_dots_content.push(child);
+                        // Also encode the dot's functionality (i.e., division)
+                        child.setAttribute('form', 'div');
+                    } else {
+                        console.log("This child of corr is not a note/rest/dot:");
+                        console.log(child);
+                        console.log("It is a " + child.tagName);
+                    }
+                }
             } else {
                 console.log("Unexpected tagnme : " + name + "\n(not a note, rest, dot, or ligature)\n");
             }
         }
-        //console.log(voice_noterest_dots_content);
+        /*for (member of voice_noterest_dots_content) {
+            var member_attrib = member.getAttribute('dur') + "_" + member.getAttribute('pname') + member.getAttribute('oct');
+            if (member_attrib == 'null_nullnull') {
+                member_attrib = '';
+            } console.log(member.tagName + " " + member_attrib);
+        }console.log();*/
 
         // Find indices for starting and ending points of each sequence of notes to be analyzed.
         var list_of_indices_geq_B_and_dots = []; // list of indices of notes greater or equal to the Breve and the indices of group markings (these are, dots of division and beginning and ending of ligatures)
@@ -407,8 +427,8 @@ const lining_up = quasiscore_mensural_doc => {
 
         // Semibreves in between breves (or higher note values)
         if (tempus == 3) {
-            //console.log("\nBREVE GEQ")
-            //console.log(list_of_indices_geq_B_and_dots + "\n")
+            //console.log("\nBREVE GEQ");
+            //console.log(list_of_indices_geq_B_and_dots + "\n");
             if (!(list_of_indices_geq_B_and_dots.includes(0)) && list_of_indices_geq_B_and_dots.length != 0) {
                 f = list_of_indices_geq_B_and_dots[0];
                 middle_notes = voice_noterest_dots_content.slice(0,f);
