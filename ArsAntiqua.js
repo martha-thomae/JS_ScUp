@@ -409,6 +409,8 @@ const lining_up = quasiscore_mensural_doc => {
             var member_attrib = member.getAttribute('dur') + "_" + member.getAttribute('pname') + member.getAttribute('oct');
             if (member_attrib == 'null_nullnull') {
                 member_attrib = '';
+            } else if (member_attrib.slice(member_attrib.length-9, member_attrib.length) == '_nullnull') {
+                member_attrib = member_attrib.slice(0, member_attrib.length-9);
             } console.log(member.tagName + ' ' + member_attrib);
         }console.log();*/
 
@@ -481,9 +483,13 @@ const lining_up = quasiscore_mensural_doc => {
                 var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
                 var m = "";
                 for (var midnote of middle_notes){
-                    m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
-                }
-                console.log(s + ", " + m + e);
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log(s + ", " + m + e);
 
                 breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain);
             }
@@ -505,12 +511,41 @@ const lining_up = quasiscore_mensural_doc => {
                 var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
                 var m = "";
                 for (var midnote of middle_notes){
-                    m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
-                }
-                console.log(s + ", " + m + e);
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log(s + ", " + m + e);
 
                 breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain);
             }
+
+            // If the last note on the voice_noterest_dots_content isn't a longa (or maxima):
+            var index_last_noterest = voice_noterest_dots_content.length - 1;
+            if (!(list_of_indices_geq_L.includes(index_last_noterest))) {
+                o = list_of_indices_geq_L[list_of_indices_geq_L.length - 1];
+                start_note = voice_noterest_dots_content[o];
+                end_note = null;
+                following_note = null;
+                middle_notes = voice_noterest_dots_content.slice(o+1,index_last_noterest+1);
+                //DEBUG:
+                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+                var e = null;
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log(s + ", " + m + e);
+
+                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain);
+            }
+
         } else {
             // modusminor = 2
         }
