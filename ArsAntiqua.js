@@ -29,6 +29,7 @@ function get_preceding_noterest(target_element) {
 function counting_semibreves(sequence_of_notes, note_durs, undotted_note_gain) {
     var sb_counter, note, dur, index, gain, ratio;
     sb_counter = 0;
+    console.log('@dur\t\tCounter (Sb)\tAccumulator (Sb)');
     for (note of sequence_of_notes) {
         dur = note.getAttribute('dur');
         try {
@@ -43,7 +44,7 @@ function counting_semibreves(sequence_of_notes, note_durs, undotted_note_gain) {
             gain = ratio.mul(gain);
         }
         sb_counter += gain;
-        console.log(dur + ", " + gain + ", " + sb_counter);
+        console.log(dur + Array(10-dur.length).join(' ') + "\t" + gain + "\t\t" + sb_counter);
     }
     return sb_counter;
 }
@@ -291,9 +292,9 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     }
     // 2. Use the counter of semibreves to determine the total of breves in the middle_notes
     var sb_counter = counting_semibreves(sequence_of_middle_notes, note_durs, undotted_note_gain);
-    console.log(sb_counter);
+    console.log("TOTAL (Sb): " + sb_counter);
     var count_B = sb_counter / tempus;
-    console.log(count_B);
+    console.log("TOTAL (B):  " + count_B);
     console.log();
 
     modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa');
