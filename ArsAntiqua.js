@@ -300,9 +300,11 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
 }
 
 function replace_ligatures_by_brackets(meiDoc){
-    // Retrieve all ligatures
+    // Replace all ligatures by <bracketSpan> elements located at the end of the <section>
+    const section = meiDoc.getElementsByTagName('section')[0];
+    // First, retrieve all ligatures
     const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
-    // For each ligature
+    // Then, for each ligature
     for (var ligature of ligatures) {
         // 1. Take the notes contained within that <ligature>
         // and incorporate them into the stream of notes of the <layer>
@@ -311,11 +313,9 @@ function replace_ligatures_by_brackets(meiDoc){
         for (var note of ligated_notes) {
             parent.insertBefore(note, ligature);
         }
-        // 2. Substitute the <ligature> for a <bracketSpan> element
-        // Create the <bracketSpan> element to replace the ligature
+        // 2. And create the <bracketSpan> element to replace the ligature
         var bracketSpan = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'bracketSpan');
         bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
-        parent.replaceChild(bracketSpan, ligature);
         // With @startid and @endid pointing to the start and end of the ligature
         var start_note = ligated_notes[0];
         var end_note = ligated_notes[ligated_notes.length - 1];
@@ -324,6 +324,10 @@ function replace_ligatures_by_brackets(meiDoc){
         // And with attributes corresponding to a mensural ligature
         bracketSpan.setAttribute('func', 'ligature');
         bracketSpan.setAttribute('lform', 'solid');
+        // 3. Remove the ligature
+        parent.removeChild(ligature);
+        // 4. Add the <bracketSpan> to the end of <section>
+        section.appendChild(bracketSpan);
     }
 }
 
