@@ -353,10 +353,10 @@ const lining_up = quasiscore_mensural_doc => {
         console.log(undotted_note_gain);
         console.log();
 
-        // Getting all the relevant elements of a staff into a python list (in order of appearance).
+        // Getting all the relevant elements of a staff into an array (in order of appearance).
         // The relevant elements (for Ars antiqua) are notes, rests, dots, and other group markings (such as ligatures).
         // Dots and ligatures are useful for marking the division of groups of semibreves equivalent to a breve.
-        // The python list allows to retrieve the index, which is not possible with MEI lists.
+        // The array allows to retrieve the index, which is not possible with MEI lists.
         var voice_content = staff.getElementsByTagName('layer')[0].children;
         var voice_noterest_dots_content = [];
         for (var element of voice_content){
@@ -385,6 +385,8 @@ const lining_up = quasiscore_mensural_doc => {
                 }
                 voice_noterest_dots_content.push(quasiscore_mensural_doc.createElementNS('http://www.music-encoding.org/ns/mei', 'Group_End'));
             } else if (name == 'choice'){
+                // The relevant <note>, <rest>, and <dot> elements can be contained
+                // within a <corr> element due to editorial corrections
                 var corr = element.getElementsByTagName('corr')[0];
                 for (var child of corr.children) {
                     if (child.tagName == 'note' || child.tagName == 'rest') {
@@ -403,11 +405,11 @@ const lining_up = quasiscore_mensural_doc => {
                 console.log("Unexpected tagnme : " + name + "\n(not a note, rest, dot, or ligature)\n");
             }
         }
-        /*for (member of voice_noterest_dots_content) {
+        /*for (var member of voice_noterest_dots_content) {
             var member_attrib = member.getAttribute('dur') + "_" + member.getAttribute('pname') + member.getAttribute('oct');
             if (member_attrib == 'null_nullnull') {
                 member_attrib = '';
-            } console.log(member.tagName + " " + member_attrib);
+            } console.log(member.tagName + ' ' + member_attrib);
         }console.log();*/
 
         // Find indices for starting and ending points of each sequence of notes to be analyzed.
