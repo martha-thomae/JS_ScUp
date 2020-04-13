@@ -327,6 +327,16 @@ function replace_ligatures_by_brackets(meiDoc){
     }
 }
 
+function replace_maximas_by_duplexlongas(meiDoc){
+    const notes = Array.from(meiDoc.getElementsByTagName('note'));
+    for (var note of notes) {
+        if (note.getAttribute('dur') == 'maxima') {
+            note.setAttribute('dur', 'longa');
+            note.setAttribute('dur.quality', 'duplex');
+        }
+    }
+}
+
 // Main function
 const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
@@ -347,7 +357,7 @@ const lining_up = quasiscore_mensural_doc => {
         if (tempus == null){tempus = 3;}
 
         // Individual note values and gains, according to the mensuration
-        var note_durs = ['semibrevis', 'brevis', 'longa', 'maxima'];
+        var note_durs = ['semibrevis', 'brevis', 'longa'];
         var undotted_note_gain = [1, 1*tempus, modusminor * tempus];
         console.log(note_durs);
         console.log(undotted_note_gain);
@@ -421,7 +431,7 @@ const lining_up = quasiscore_mensural_doc => {
         for (var noterest of voice_noterest_dots_content) {
             if (noterest.tagName == 'dot' || noterest.tagName == 'Group_Begin' || noterest.tagName == 'Group_End' || noterest.getAttribute('dur') == 'brevis'){
                 list_of_indices_geq_B_and_dots.push(voice_noterest_dots_content.indexOf(noterest));
-            } else if (noterest.getAttribute('dur') == 'longa') {
+            } else if (noterest.getAttribute('dur') == 'longa' || noterest.getAttribute('dur') == 'maxima') {
                 list_of_indices_geq_B_and_dots.push(voice_noterest_dots_content.indexOf(noterest));
                 list_of_indices_geq_L.push(voice_noterest_dots_content.indexOf(noterest));
             }
@@ -552,6 +562,7 @@ const lining_up = quasiscore_mensural_doc => {
     }
 
     replace_ligatures_by_brackets(quasiscore_mensural_doc);
+    replace_maximas_by_duplexlongas(quasiscore_mensural_doc);
 
     return quasiscore_mensural_doc;
 };
