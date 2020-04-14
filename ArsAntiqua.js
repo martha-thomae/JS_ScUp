@@ -336,8 +336,12 @@ function replace_maximas_by_duplexlongas(meiDoc){
     const notes = Array.from(meiDoc.getElementsByTagName('note'));
     for (var note of notes) {
         if (note.getAttribute('dur') == 'maxima') {
+            // Turn maximas into duplex longas
             note.setAttribute('dur', 'longa');
             note.setAttribute('dur.quality', 'duplex');
+            // Use (for now) the num and numbase attributes to make the longa 'duplex'
+            note.setAttribute('num', '1');
+            note.setAttribute('numbase', '2');
         }
     }
 }
