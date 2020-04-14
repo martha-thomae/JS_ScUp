@@ -65,6 +65,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             if (start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note))){
             // Default Case
                 // Imperfection a.p.p.
+                console.log("Default Case:\tImperfection a.p.p.\n");
                 start_note.setAttribute('dur.quality', 'imperfecta');
                 start_note.setAttribute('num', '3');
                 start_note.setAttribute('numbase', '2');
@@ -73,6 +74,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             else if (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note))){
             // Exception Case
                 // Imperfection a.p.a.
+                console.log("Alternative Case:  Imperfection a.p.a.\n");
                 end_note.setAttribute('dur.quality', 'imperfecta');
                 end_note.setAttribute('num', '3');
                 end_note.setAttribute('numbase', '2');
@@ -107,6 +109,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))){
                 // Default case
                     // Alteration
+                    console.log("Default Case:\tAlteration\n");
                     last_uncolored_note.setAttribute('dur.quality', 'altera');
                     last_uncolored_note.setAttribute('num', '1');
                     last_uncolored_note.setAttribute('numbase', '2');
@@ -114,6 +117,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
 
                 else if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note))) && (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)))){
                 // Exception Case
+                    console.log("Alternative Case:  Imperfection a.p.p. & Imperfection a.p.a.\n");
                     // Imperfection a.p.p.
                     start_note.setAttribute('dur.quality', 'imperfecta');
                     start_note.setAttribute('num', '3');
@@ -149,12 +153,14 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                         if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))){
                         // Exception Case
                             // Alteration
+                            console.log("Alternative Case:  Alteration\n");
                             last_uncolored_note.setAttribute('dur.quality', 'altera');
                             last_uncolored_note.setAttribute('num', '1');
                             last_uncolored_note.setAttribute('numbase', '2');
                         }
                         else {
                         // Default + Warning Case
+                            console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
                             // If the "alternative interpretation" is forbidden, and imperfection imp. a.p.a. was discarded just because it entered in conflict with rule # 1
                             // (this is, impapa_against_rule1 flag is True), then we force imperfection a.p.a. as it is the only viable option. But we also raise a 'warning'
                             // Imperfection a.p.p.
@@ -173,6 +179,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                     // If it does not enter in conflict, we go with the "Default interpretation" of the notes
                     } else {
                     // Default Case
+                        console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
                         // Imperfection a.p.p.
                         start_note.setAttribute('dur.quality', 'imperfecta');
                         start_note.setAttribute('num', '3');
@@ -187,6 +194,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 else if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))){
                 // Exception Case
                     // Alteration
+                    console.log("Alternative Case:  Alteration\n");
                     last_uncolored_note.setAttribute('dur.quality', 'altera');
                     last_uncolored_note.setAttribute('num', '1');
                     last_uncolored_note.setAttribute('numbase', '2');
@@ -205,6 +213,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
 
             if (counter <= 3) {
                 // When 0 or 3 breves left out, no modifications to perform
+                console.log("Default Case:\tNo modifications\n");
             }
 
             else {
@@ -221,6 +230,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
 
                 if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !((has_been_modified(start_note)))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))){
                 // Default Case:
+                    console.log("Default Case:\tImperfection a.p.p. & Alteration\n");
                     // Imperfection a.p.p.
                     start_note.setAttribute('dur.quality', 'imperfecta');
                     start_note.setAttribute('num', '3');
@@ -232,6 +242,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 }
 
                 else {// Exception Case:
+                    console.log("Alternative Case:  No modifications\n");
                     // Start note remains perfect
                 }
 
