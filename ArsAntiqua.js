@@ -250,7 +250,33 @@ function modification(counter, start_note, middle_notes, end_note, following_not
     }
 }
 
-function modification_semibreve_level(middle_notes) {
+function modification_semibreve_level(middle_notes, tempus) {
+    switch(tempus){
+        case 2:
+            two_semibreves_per_breve(middle_notes);
+            break;
+        case 3:
+            three_semibreves_per_breve(middle_notes);
+    }
+}
+
+function two_semibreves_per_breve(middle_notes) {
+    switch(middle_notes.lenght) {
+        case 1: // If there is 1 semibreve:
+            // Mistake: this shouldn't happen in Ars antiqua
+            console.log("MISTAKE: 1 semibreve standing alone (this is not proper of Ars antiqua)");
+            break;
+        case 2: // If there are 2 semibreves:
+            break;
+        default: // For more than three semibreves:
+            for (var note of middle_notes) {
+                note.setAttribute('num', middle_notes.length);
+                note.setAttribute('numbase', '2');
+            }
+    }
+}
+
+function three_semibreves_per_breve(middle_notes) {
     var note, note1, note2;
 
     switch(middle_notes.length){
@@ -459,42 +485,43 @@ const lining_up = quasiscore_mensural_doc => {
 
         var o, f, start_note, end_note, middle_notes, following_note;
 
-        // Semibreves in between breves (or higher note values)
-        if (tempus == 3) {
-            //console.log("\nBREVE GEQ");
-            //console.log(list_of_indices_geq_B_and_dots + "\n");
-            if (!(list_of_indices_geq_B_and_dots.includes(0)) && list_of_indices_geq_B_and_dots.length != 0) {
-                f = list_of_indices_geq_B_and_dots[0];
-                middle_notes = voice_noterest_dots_content.slice(0,f);
-                /*//DEBUG:
-                var m = "";
-                for (var midnote of middle_notes){
-                    m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
-                }
-                console.log("null, " + m + "null");
-                */
-                modification_semibreve_level(middle_notes);
-            }
+        // PROCESSING OF SEMIBREVES (REGARDLESS OF THE @TEMPUS)
+        // SEQUENCES OF SEMIBREVES DELIMITED BY BREVES (OR HIGHER NOTE VALUES)
 
-            for (var j = 0; j < list_of_indices_geq_B_and_dots.length-1; j++) {
-                // Define the sequence of notes
-                o = list_of_indices_geq_B_and_dots[j];
-                f = list_of_indices_geq_B_and_dots[j+1];
-                middle_notes = voice_noterest_dots_content.slice(o+1,f);
-                /*//DEBUG:
-                var m = "";
-                for (var midnote of middle_notes){
-                    m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
-                }
-                console.log("null, " + m + "null");
-                */
-                modification_semibreve_level(middle_notes);
+        //console.log("\nBREVE GEQ");
+        //console.log(list_of_indices_geq_B_and_dots + "\n");
+        if (!(list_of_indices_geq_B_and_dots.includes(0)) && list_of_indices_geq_B_and_dots.length != 0) {
+            f = list_of_indices_geq_B_and_dots[0];
+            middle_notes = voice_noterest_dots_content.slice(0,f);
+            /*//DEBUG:
+            var m = "";
+            for (var midnote of middle_notes){
+                m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
             }
-        } else {
-            // tempus = 2
+            console.log("null, " + m + "null");
+            */
+            modification_semibreve_level(middle_notes, tempus);
         }
 
-        // Breves in between longas (or higher note values)
+        for (var j = 0; j < list_of_indices_geq_B_and_dots.length-1; j++) {
+            // Define the sequence of notes
+            o = list_of_indices_geq_B_and_dots[j];
+            f = list_of_indices_geq_B_and_dots[j+1];
+            middle_notes = voice_noterest_dots_content.slice(o+1,f);
+            /*//DEBUG:
+            var m = "";
+            for (var midnote of middle_notes){
+                m += midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur') + ", ";
+            }
+            console.log("null, " + m + "null");
+            */
+            modification_semibreve_level(middle_notes, tempus);
+        }
+
+
+        // PROCESSING OF BREVES AND LONGS (DEPENDING ON THE @MODUSMINOR)
+        // SEQUENCES OF BREVES DELIMITED BY LONGS (OR HIGHER NOTE VALUES)
+
         if (modusminor == 3) {
             //console.log("\nLONGA GEQ");
             //console.log(list_of_indices_geq_L + "\n");
