@@ -108,17 +108,17 @@ function expand_repeating_tenor(meiDoc){
     var repeating_tenor = get_set_of_repeated_notes(tenor_layer, startid_ref.slice(1,), endid_ref.slice(1,));
 
     // Expand the repeated tenor into individual notes with @copyof
-    var xmlId, attribName, attribValue;
+    var xmlId, copied_element;
     for (var i = 0; i < times; i++) {
         for (var element of repeating_tenor){
-            var copied_element = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', element.tagName);
-            for (attribName in element.getAttributeNames) {
-                attribValue = element.getAttribute(attribName);
-                copied_element.setAttribute(attribName, attribValue);
-            }
             xmlId = element.getAttribute('xml:id');
+            // Create a clone of the element
+            copied_element = element.cloneNode(true);
+            // Add the @copyof attribute and change its XML ID based on the original ID
             copied_element.setAttribute('copyof', '#'+xmlId);
             copied_element.setAttribute('xml:id', xmlId+'_'+(i+1));
+            // Add the cloned element
+            //(this will add it with the same attributes and descendants as the original)
             tenor_layer.appendChild(copied_element);
         }
     }
