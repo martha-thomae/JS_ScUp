@@ -79,18 +79,26 @@ function expand_repeating_tenor(meiDoc){
     var repeating_tenor = get_set_of_repeated_notes(tenor_layer, startid_ref.slice(1,), endid_ref.slice(1,));
 
     // Expand the repeated tenor into individual notes with @copyof
-    var xmlId, copied_element;
+    var xmlId, copied_element, copied_descendant;
     for (var i = 0; i < times; i++) {
         for (var element of repeating_tenor){
-            xmlId = element.getAttribute('xml:id');
-            // Create a clone of the element
+            // Create a clone of the element (this will keep attributes and descendants)
             copied_element = element.cloneNode(true);
             // Add the @copyof attribute and change its XML ID based on the original ID
+            xmlId = element.getAttribute('xml:id');
             copied_element.setAttribute('copyof', '#'+xmlId);
             copied_element.setAttribute('xml:id', xmlId+'_'+(i+1));
             // Add the cloned element
             //(this will add it with the same attributes and descendants as the original)
             tenor_layer.appendChild(copied_element);
+            // And change the XML ID of the descendants of these clones
+            //(so that they don't have the same as the origianl descenadants)
+            // and add the appropriate @copyof value.
+            for (copied_descendant of copied_element.querySelectorAll('*')){
+                xmlId = copied_descendant.getAttribute('xml:id');
+                copied_descendant.setAttribute('copyof', '#'+xmlId);
+                copied_descendant.setAttribute('xml:id', xmlId+'_'+(i+1));
+            }
         }
     }
     // Finally, remove the <dir> element encoding the repetition
