@@ -43,35 +43,6 @@ function clef_definition(staff, staffDef) {
     }
 }
 
-/*function get_set_of_repeated_notes(tenor_layer, startid, endid) {
-    const tenor_music_content = Array.from(tenor_layer.children);
-    
-    var repeating_tenor = Array.from([]);
-    var repeated_note_flag = false;
-
-    for (var noterest of tenor_music_content) {
-        // Find the first note on the repeating tenor (based on the startid)
-        // From this note the repeated_note_flag is set to true and it will remain
-        // as true until reaching the last note of the repeating tenor
-        if (noterest.getAttribute('xml:id') == startid) {
-            repeated_note_flag = true;
-        }
-        // All notes between the notes with startid and endid (inclusive), will be
-        // included into the repeating_tenor array (given the repeated_note_flag value)
-        if (repeated_note_flag) {
-            repeating_tenor.push(noterest);
-        }
-        // When finding the last repeated note (based on the endid)
-        // the repeated_note_flag will change back to false,
-        // so that no note after this one will be added into the repeating_tenor array
-        if (noterest.getAttribute('xml:id') == endid) {
-            repeated_note_flag = false;
-            break;
-        }
-    }
-    return repeating_tenor;
-}*/
-
 function get_set_of_repeated_notes(tenor_layer, startid, endid){
     const tenor_music_content = Array.from(tenor_layer.children);
     var start_index, end_index;
