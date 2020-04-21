@@ -61,6 +61,72 @@ function get_set_of_repeated_notes(tenor_layer, startid, endid){
     return repeated_notes;
 }
 
+function add_cloned_elements(tenor_layer, repeating_tenor, times){
+    // Expand the repeated tenor into individual notes by cloning its elements
+    // and adding them (with a @copyof attribute) in the right place
+    var followElem, flagRepeatAtEnd, i, element, copied_element, xmlId, copied_descendant;
+    var lastRptNote = repeating_tenor[repeating_tenor.length-1];
+
+    // Determine the place to add the copied notes
+    // (at the end of the layer or not)
+    try {
+        followElem = lastRptNote.nextSibling;
+        flagRepeatAtEnd = false;
+    } catch(err) {
+        flagRepeatAtEnd = true;
+    }
+
+    // Based on the location, either: 
+    if (flagRepeatAtEnd){
+        // Add the notes at the end of the tenor_layer (appendChild)
+        for (i = 0; i < times; i++) {
+            for (element of repeating_tenor){
+                // Create a clone of the element (this will keep attributes and descendants)
+                copied_element = element.cloneNode(true);
+                // Add the @copyof attribute and change its XML ID based on the original ID
+                xmlId = element.getAttribute('xml:id');
+                copied_element.setAttribute('copyof', '#'+xmlId);
+                copied_element.setAttribute('xml:id', xmlId+'_'+(i+1));
+                // Add the cloned element
+                //(this will add it with the same attributes and descendants as the original)
+                tenor_layer.appendChild(copied_element);
+                // And change the XML ID of the descendants of these clones
+                //(so that they don't have the same as the origianl descenadants)
+                // and add the appropriate @copyof value.
+                for (copied_descendant of copied_element.querySelectorAll('*')){
+                    xmlId = copied_descendant.getAttribute('xml:id');
+                    copied_descendant.setAttribute('copyof', '#'+xmlId);
+                    copied_descendant.setAttribute('xml:id', xmlId+'_'+(i+1));
+                }
+            }
+        }
+    } else {
+        // Add the notes before the element following the last
+        // element of the repeated tenor (insertBefore method)
+        for (i = 0; i < times; i++) {
+            for (element of repeating_tenor){
+                // Create a clone of the element (this will keep attributes and descendants)
+                copied_element = element.cloneNode(true);
+                // Add the @copyof attribute and change its XML ID based on the original ID
+                xmlId = element.getAttribute('xml:id');
+                copied_element.setAttribute('copyof', '#'+xmlId);
+                copied_element.setAttribute('xml:id', xmlId+'_'+(i+1));
+                // Add the cloned element
+                //(this will add it with the same attributes and descendants as the original)
+                tenor_layer.insertBefore(copied_element, followElem);
+                // And change the XML ID of the descendants of these clones
+                //(so that they don't have the same as the origianl descenadants)
+                // and add the appropriate @copyof value.
+                for (copied_descendant of copied_element.querySelectorAll('*')){
+                    xmlId = copied_descendant.getAttribute('xml:id');
+                    copied_descendant.setAttribute('copyof', '#'+xmlId);
+                    copied_descendant.setAttribute('xml:id', xmlId+'_'+(i+1));
+                }
+            }
+        }
+    }
+}
+
 function expand_repeating_tenor(meiDoc){
     // Find the <dir> element and use it to locate the tenor's <staff> and <layer> elements
     const dir = meiDoc.getElementsByTagName('dir')[0];
@@ -78,29 +144,11 @@ function expand_repeating_tenor(meiDoc){
     // Retrieve the notes repeated in the tenor
     var repeating_tenor = get_set_of_repeated_notes(tenor_layer, startid_ref.slice(1,), endid_ref.slice(1,));
 
-    // Expand the repeated tenor into individual notes with @copyof
-    var xmlId, copied_element, copied_descendant;
-    for (var i = 0; i < times; i++) {
-        for (var element of repeating_tenor){
-            // Create a clone of the element (this will keep attributes and descendants)
-            copied_element = element.cloneNode(true);
-            // Add the @copyof attribute and change its XML ID based on the original ID
-            xmlId = element.getAttribute('xml:id');
-            copied_element.setAttribute('copyof', '#'+xmlId);
-            copied_element.setAttribute('xml:id', xmlId+'_'+(i+1));
-            // Add the cloned element
-            //(this will add it with the same attributes and descendants as the original)
-            tenor_layer.appendChild(copied_element);
-            // And change the XML ID of the descendants of these clones
-            //(so that they don't have the same as the origianl descenadants)
-            // and add the appropriate @copyof value.
-            for (copied_descendant of copied_element.querySelectorAll('*')){
-                xmlId = copied_descendant.getAttribute('xml:id');
-                copied_descendant.setAttribute('copyof', '#'+xmlId);
-                copied_descendant.setAttribute('xml:id', xmlId+'_'+(i+1));
-            }
-        }
-    }
+    // Expand the repeated tenor into individual notes with @copyof attribute.
+    // This is done by adding the copied elements in the appropriate place of the
+    // tenor_layer a given number of times
+    add_cloned_elements(tenor_layer, repeating_tenor, times);
+
     // Finally, remove the <dir> element encoding the repetition
     tenor_staff.removeChild(dir);
 }
