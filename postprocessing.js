@@ -1,6 +1,6 @@
 /*
     POST-PROCESSING
-    
+
     Post-processing methods (to be selected by the user), including:
     - Change to modern clefs
     - Barring of the piece by the long by adding dotted barlines
@@ -162,7 +162,7 @@ function add_barlines(meiDoc){
         var staffDef = stavesDef[i];
         var staff = staves[i];
         // Obtain the ORDERED sequence of notes and rests within that voice
-        staff_layer = staff.children[0];
+        var staff_layer = staff.children[0];
         var seqNotesAndRests = Array.from([]);
         for (var element of staff_layer.children) {
             switch(element.tagName) {
