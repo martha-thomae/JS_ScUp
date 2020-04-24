@@ -43,22 +43,26 @@ function clef_definition(staff, staffDef) {
     }
 }
 
+/*
+    REPEATING TENOR FUNCTIONS:
+    The "main" function is the "expand_repeating_tenor" which calls both the
+    "get_set_of_repeated_notes" to retrieve all the elements that should be
+    repeated (e.g., notes, rests, ligatures) and then it adds each of them
+    with the "add_cloned_elements" function.
+*/
 function get_set_of_repeated_notes(tenor_layer, startid, endid){
-    const tenor_music_content = Array.from(tenor_layer.children);
-    var start_index, end_index;
-    var index = 0;
-    // Find the indices representing the start and end of the repeated tenor
-    for (var noterest of tenor_music_content) {
-        if (noterest.getAttribute('xml:id') == startid) {
-            start_index = index;
-        } else if (noterest.getAttribute('xml:id') == endid) {
-            end_index = index;
-            break;
-        } index += 1;
-    }
-    // Use these indices to get the sequence of repeated notes/rests in the tenor
-    const repeated_notes = tenor_music_content.slice(start_index, end_index + 1);
-    return repeated_notes;
+    // Define repeated_elements array and add its starting element (based on the startid)
+    var startRptElement = tenor_layer.querySelector("[xml:id='" + startid + "']");
+    var repeated_elements = Array.from([startRptElement]);
+    var nextRptElement = startRptElement.nextSibling;
+    // Add all the following elements
+    while (nextRptElement.getAttribute('xml:id') != endid) {
+        if (nextRptElement.tagName != 'clef') {
+            repeated_elements.push(nextRptElement);
+        } nextRptElement = nextRptElement.nextSibling;
+    }// Add last repeated element (corresponding to the endid)
+    repeated_elements.push(nextRptElement);
+    return repeated_elements;
 }
 
 function add_cloned_elements(tenor_layer, repeating_tenor, times){
@@ -203,6 +207,7 @@ const merge = meiDoc => {
         clef_definition(staff, staffDef);
     }
     // Expand repeating tenor if there is one
+    // (this is, if there is a <dir> element encoding the repeating tenor)
     if (meiDoc.getElementsByTagName('dir').length != 0){
         expand_repeating_tenor(meiDoc);
     }
