@@ -192,12 +192,15 @@ function add_barlines(meiDoc){
         var tempus = staffDef.getAttribute('tempus');
         if (tempus == null){tempus = 3;}
         var barLength = modusminor * tempus;
+        console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength + ' Sb');
         // 2. Add the barlines where the accumulated value of the notes (in semibreves,
         // as can be found using the @sb_value added in the 'add_sb_value' function) is
         // equal to the bar-length.
         var accum = 0; 
         for (var noterest of seqNotesAndRests) {
-            accum += noterest.getAttribute('sb_value');
+            accum += parseFloat(noterest.getAttribute('sb_value'));
+            console.log(noterest.tagName + ' ' + noterest.getAttribute('dur') + ' ' + noterest.getAttribute('sb_value'));
+            console.log(accum);
             if (accum % barLength == 0){
                 barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
