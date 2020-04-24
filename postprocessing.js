@@ -202,7 +202,7 @@ function add_barlines(meiDoc){
             console.log(noterest.tagName + ' ' + noterest.getAttribute('dur') + ' ' + noterest.getAttribute('sb_value'));
             console.log(accum);
             if (accum % barLength == 0){
-                barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
+                var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
                 staff_layer.insertBefore(barline, noterest.nextSibling);
             }
