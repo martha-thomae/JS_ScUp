@@ -166,17 +166,27 @@ const merge = meiDoc => {
     mdiv.appendChild(score);
 
     // Add everything related to the metadata of the score (<scoreDef> and descendants)
-    // Add (new) <scoreDef>
+    // Add (new) <scoreDef> (include @midi.bpm = 600 for playback)
     const scoreDef = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'scoreDef');
+    scoreDef.setAttribute('midi.bpm', '600');
     score.appendChild(scoreDef);
-    // Add (new) <staffGrp>
+    // Add (new) <staffGrp> (include @symbol = bracket)
     const staffGrp = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'staffGrp');
+    staffGrp.setAttribute('symbol', 'bracket');
     scoreDef.appendChild(staffGrp);
     // Add the pre-existing <staffDef> elements for each voice
     const stavesDef_list = mei.getElementsByTagName("staffDef");
     const stavesDef = Array.from(stavesDef_list);
     for (var staffDef of stavesDef){
         staffGrp.appendChild(staffDef);
+        // Add <label> as a child of <staffDef> to include the voice type as text
+        var label = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'label');
+        label.textContent = staffDef.getAttribute('label');
+        staffDef.appendChild(label);
+        // And remove the corresponding @label attribute from <staffDef>
+        // (the value of @label does not get rendered in Verovio)
+        staffDef.removeAttribute('label');
+
     }
     // Add everything related to the music content
     // Add <section>
