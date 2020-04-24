@@ -1,5 +1,6 @@
 const MergeModule = require('./Merge.js');
 const ArsAntiqua = require('./ArsAntiqua.js');
+const PostProcess = require('./postprocessing.js');
 //const ArsNova_and_WhiteMensural = require('./ArsNova_and_WhiteMensural.js');
 
 const { JSDOM } = require('jsdom');
@@ -182,8 +183,9 @@ switch (notation){
                 break;
         }break;
 }
+finalScoreDoc = PostProcess.refine_score(scoreDoc, true, true);
 
 const serializer = new XMLSerializer();
-const content = serializer.serializeToString(scoreDoc);
+const content = serializer.serializeToString(finalScoreDoc);
 
 console.log(content);
