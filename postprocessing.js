@@ -196,7 +196,7 @@ function add_barlines(meiDoc){
         // 2. Add the barlines where the accumulated value of the notes (in semibreves,
         // as can be found using the @sb_value added in the 'add_sb_value' function) is
         // equal to the bar-length.
-        var accum = 0; 
+        var accum = 0;
         for (var noterest of seqNotesAndRests) {
             accum += parseFloat(noterest.getAttribute('sb_value'));
             console.log(noterest.tagName + ' ' + noterest.getAttribute('dur') + ' ' + noterest.getAttribute('sb_value'));
@@ -213,10 +213,8 @@ function add_barlines(meiDoc){
 /*
     Refine score by improving readability by modern musicians
     (switching the clefs into CMN and barring the piece) as indicated by the user
-
 */
 const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
-    // 
     if (switch_to_modern_clefs_flag) {
         mensural_to_modern_clefs(scoreDoc);
     }
