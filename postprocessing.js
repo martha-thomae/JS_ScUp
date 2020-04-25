@@ -74,6 +74,13 @@ function mensural_to_modern_clefs(meiDoc) {
                 break;
         }
     }
+    // Remove all <clef> elements
+    //(they represent a change in clef in the original source)
+    const cleves = Array.from(meiDoc.getElementsByTagName('clef'));
+    for (var clef of cleves) {
+        var parent = clef.parentElement;
+        parent.removeChild(clef);
+    }
 }
 
 function add_sb_value(meiDoc) {
