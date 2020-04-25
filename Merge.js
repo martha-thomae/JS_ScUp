@@ -3,6 +3,10 @@
     Change the file structure from parts-based to score-based.
     Returns a quasi-score (staves piled-up without voice alignment).
 */
+const { JSDOM } = require('jsdom');
+const window = new JSDOM().window;
+const DOMParser = window.DOMParser;
+
 function cleanup(meiDoc) {
     const pb_elements = Array.from(meiDoc.getElementsByTagName('pb'));
     const sb_elements = Array.from(meiDoc.getElementsByTagName('sb'));
@@ -50,9 +54,10 @@ function clef_definition(staff, staffDef) {
     repeated (e.g., notes, rests, ligatures) and then it adds each of them
     with the "add_cloned_elements" function.
 */
-function get_set_of_repeated_notes(tenor_layer, startid, endid){
+function get_set_of_repeated_notes(meiDoc, startid, endid){
     // Define repeated_elements array and add its starting element (based on the startid)
-    var startRptElement = tenor_layer.querySelector("[xml:id='" + startid + "']");
+    var resolver = meiDoc.createNSResolver(meiDoc.ownerDocument == null ? meiDoc.documentElement : meiDoc.ownerDocument.documentElement);
+    var startRptElement = meiDoc.evaluate("//*[@xml:id='" + startid + "']", meiDoc, resolver, window.XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     var repeated_elements = Array.from([startRptElement]);
     var nextRptElement = startRptElement.nextSibling;
     // Add all the following elements
@@ -146,7 +151,7 @@ function expand_repeating_tenor(meiDoc){
     var times = dir.getAttribute('n');
 
     // Retrieve the notes repeated in the tenor
-    var repeating_tenor = get_set_of_repeated_notes(tenor_layer, startid_ref.slice(1,), endid_ref.slice(1,));
+    var repeating_tenor = get_set_of_repeated_notes(meiDoc, startid_ref.slice(1,), endid_ref.slice(1,));
 
     // Expand the repeated tenor into individual notes with @copyof attribute.
     // This is done by adding the copied elements in the appropriate place of the
