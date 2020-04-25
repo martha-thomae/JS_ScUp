@@ -3,9 +3,6 @@
     Change the file structure from parts-based to score-based.
     Returns a quasi-score (staves piled-up without voice alignment).
 */
-const { JSDOM } = require('jsdom');
-const window = new JSDOM().window;
-const DOMParser = window.DOMParser;
 
 function cleanup(meiDoc) {
     const pb_elements = Array.from(meiDoc.getElementsByTagName('pb'));
