@@ -20,6 +20,7 @@
     "fraction.js": "^4.0.12"
   },
   "devDependencies": {
+    "global-jsdom": "^6.1.0",
     "jsdom": "^16.2.1"
   }
 }

@@ -3,8 +3,7 @@ const ArsAntiqua = require('./ArsAntiqua.js');
 const PostProcess = require('./postprocessing.js');
 //const ArsNova_and_WhiteMensural = require('./ArsNova_and_WhiteMensural.js');
 
-const { JSDOM } = require('jsdom');
-const window = new JSDOM().window;
+require('global-jsdom')()
 const DOMParser = window.DOMParser;
 const XMLSerializer = window.XMLSerializer;
 
