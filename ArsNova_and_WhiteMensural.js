@@ -26,16 +26,19 @@ function followed_by_dot(target_element) {
     }
 }
 
-def find_first_dotted_note(sequence_of_notes):
-    """Return the index of the first dotted note in a sequence of notes"""
-    note_counter = -1
-    first_dotted_note_index = -1
-    for noterest in sequence_of_notes:
-        note_counter += 1
-        if noterest is not None and followed_by_dot(noterest):
-            first_dotted_note_index = note_counter
-            break
-    return first_dotted_note_index
+function find_first_dotted_note(sequence_of_notes) {
+    //Return the index of the first dotted note in a sequence of notes
+    var note_counter = -1;
+    var first_dotted_note_index = -1;
+    for (var noterest of sequence_of_notes) {
+        note_counter += 1;
+        if (noterest != null && followed_by_dot(noterest)) {
+            first_dotted_note_index = note_counter;
+            break;
+        }
+    }
+    return first_dotted_note_index;
+}
 
 # Functions related to the counting of minims in a sequence of notes
 def counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, undotted_note_gain):
