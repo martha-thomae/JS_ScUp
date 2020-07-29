@@ -40,25 +40,28 @@ function find_first_dotted_note(sequence_of_notes) {
     return first_dotted_note_index;
 }
 
-# Functions related to the counting of minims in a sequence of notes
-def counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, undotted_note_gain):
-    minim_counter = 0
-    print ""
-    for note in sequence_of_notes:
-        dur = note.getAttribute('dur').value
-        try:
-            index = note_durs.index(dur)
-        except:
-            print("MISTAKE\nNote/Rest element not considered: " + str(note) + ", with a duration @dur = " + dur)
-        gain = undotted_note_gain[index]
-        if note.hasAttribute('num') and note.hasAttribute('numbase'):
-            ratio = Fraction(int(note.getAttribute('numbase').value), int(note.getAttribute('num').value))
-            gain *= ratio
-        else:
-            pass
-        minim_counter += gain
-        print(dur + ", " + str(gain) + ", " + str(minim_counter))
-    return minim_counter
+// Functions related to the counting of minims in a sequence of notes
+function counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, undotted_note_gain) {
+    var minim_counter, note, dur, index, gain, ratio;
+    minim_counter = 0;
+    console.log('@dur\t\tCounter (m)\tAccumulator (m)');
+    for (note of sequence_of_notes) {
+        dur = note.getAttribute('dur');
+        try {
+            index = note_durs.indexOf(dur);
+        } catch (err) {
+            console.log("MISTAKE\nNote/Rest element not considered: " + note + ", with a duration @dur = " + dur);
+        }
+        gain = undotted_note_gain[index];
+        if (note.hasAttribute('num') && note.hasAttribute('numbase')) {
+            ratio = new Fraction([note.getAttribute('numbase'), note.getAttribute('num')]);
+            gain = ratio.mul(gain);
+        }
+        minim_counter += gain;
+        console.log(dur + Array(10-dur.length).join(' ') + "\t" + gain + "\t\t" + minim_counter);
+    }
+    return minim_counter;
+}
 
 def counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio = None, tempus = None, modusminor = None, modusmaior = None):
     minim_counter = 0
