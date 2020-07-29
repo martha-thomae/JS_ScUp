@@ -112,34 +112,52 @@ function has_been_modified(note) {
     return (note.hasAttribute('num') && note.hasAttribute('numbase'));
 }
 
-# Given the total amount of "breves" in-between the "longs", see if they can be arranged in groups of 3
-# According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-def modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note):
-    # 1 breve left out:
-    if counter % 3 == 1:
-        # Default Case
-        if start_note is not None and start_note.name == 'note' and start_note.getAttribute('dur').value == long_note and not has_been_modified(start_note) and not followed_by_dot(start_note):
-            # Imperfection a.p.p.
-            start_note.addAttribute('quality', 'i')
-            start_note.addAttribute('num', '3')
-            start_note.addAttribute('numbase', '2')
-        # Exception Case
-        elif end_note is not None and end_note.name == 'note' and end_note.getAttribute('dur').value == long_note and not has_been_modified(end_note) and not followed_by_dot(end_note):
-            # Imperfection a.p.a.
-            end_note.addAttribute('quality', 'i')
-            end_note.addAttribute('num', '3')
-            end_note.addAttribute('numbase', '2')
-            # Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
-            if following_note is not None and following_note.getAttribute('dur').value == long_note:
-                print("WARNING 1! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.")
-                print("The imperfected note is " + str(end_note) + " and is followed by the perfect note " + str(following_note))
-                print("")
-        # Mistake Case
-        else:
-            print("MISTAKE 1 - Impossible to do Imperfection a.p.p. and also Imperfection a.p.a.")
-            print(start_note)
-            print(end_note)
-            print("")
+// Given the total amount of "breves" in-between the "longs", see if they can be arranged in groups of 3
+// According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
+function modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note) {
+    var last_middle_note, last_uncolored_note;
+
+    switch(counter % 3) {
+
+        case 1: // 1 breve left out:
+
+            if (start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) {
+            // Default Case
+                // Imperfection a.p.p.
+                console.log("Default Case:\tImperfection a.p.p.\n");
+                start_note.setAttribute('dur.quality', 'imperfecta');
+                start_note.setAttribute('num', '3');
+                start_note.setAttribute('numbase', '2');
+            }
+
+            else if (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)) && !(followed_by_dot(end_note))) {
+            // Exception Case
+                // Imperfection a.p.a.
+                console.log("Alternative Case:  Imperfection a.p.a.\n");
+                end_note.setAttribute('dur.quality', 'imperfecta');
+                end_note.setAttribute('num', '3');
+                end_note.setAttribute('numbase', '2');
+                // Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
+                if (following_note != null && following_note.getAttribute('dur') == long_note) {
+                    console.log("WARNING 1! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.");
+                    console.log("The imperfected note is " + end_note + " and is followed by the perfect note " + following_note + "\n");
+                }
+            }
+
+            else {
+            // Mistake Case
+                console.log("MISTAKE 1 - Impossible to do Imperfection a.p.p. and also Imperfection a.p.a.");
+                console.log(start_note);
+                console.log(end_note);
+                console.log("\n");
+            } break;
+
+        case 2:
+            break;
+
+        case 0:
+            break;
+    }
 
     # 2 breves left out:
     elif counter % 3 == 2:
@@ -263,6 +281,7 @@ def modification(counter, start_note, middle_notes, end_note, following_note, sh
             else:
                 # Start note remains perfect
                 pass
+}
 
 def minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain):
     no_division_dot_flag = True    # Default value
