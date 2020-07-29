@@ -97,7 +97,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             // One of he possibilities when 2 breves are left out, is alteration.
             // One must alter the last (uncolored) note from the middle_notes of the sequence
             last_middle_note = middle_notes[middle_notes.length - 1];
-            // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
+            // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
             last_uncolored_note = last_middle_note;
             // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
             while (last_uncolored_note.hasAttribute('colored')){
@@ -161,7 +161,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                         else {
                         // Default + Warning Case
                             console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
-                            // If the "alternative interpretation" is forbidden, and imperfection imp. a.p.a. was discarded just because it entered in conflict with rule # 1
+                            // If the "alternative interpretation" is forbidden, and imperfection a.p.a. was discarded just because it entered in conflict with rule # 1
                             // (this is, impapa_against_rule1 flag is True), then we force imperfection a.p.a. as it is the only viable option. But we also raise a 'warning'
                             // Imperfection a.p.p.
                             start_note.setAttribute('dur.quality', 'imperfecta');
@@ -219,16 +219,15 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             else {
                 // One of the possibilities when 6,9,12,etc. breves are left out, involves alteration
                 // One must alter the last (uncolored) note from the middle_notes of the sequence
-                // The last middle note is given by:
                 last_middle_note = middle_notes[middle_notes.length - 1];
-                // If this note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
+                // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
                 last_uncolored_note = last_middle_note;
                 // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
                 while (last_uncolored_note.hasAttribute('colored')) {
                     last_uncolored_note = get_preceding_noterest(last_uncolored_note);
                 }
 
-                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !((has_been_modified(start_note)))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))){
+                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))){
                 // Default Case:
                     console.log("Default Case:\tImperfection a.p.p. & Alteration\n");
                     // Imperfection a.p.p.
