@@ -201,70 +201,76 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                     console.log("\n");
                 }
 
-            }
-            break;
+            } else { // 5, 8, 11, 14, 17, 20, ... breves between the longs
+                console.log(last_uncolored_note);
+                // Default Case: Check the conditions to apply the 'default interpretation', which implies imperfection a.p.a.
+
+                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) && (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)) && !(followed_by_dot(end_note)))) {
+                    // Check if imperfection a.p.a. enters or not in conflict with rule # 1.
+                    if (following_note != null && following_note.getAttribute('dur') == long_note) {
+                        // If it does, imperfection a.p.a. is discarded, except if the "alterantive interpretation" (the 'Exception Case') is also forbidden
+                        if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))) {
+                        // Exception Case
+                            // Alteration
+                            console.log("Alternative Case:  Alteration\n");
+                            last_uncolored_note.setAttribute('dur.quality', 'altera');
+                            last_uncolored_note.setAttribute('num', '1');
+                            last_uncolored_note.setAttribute('numbase', '2');
+                        }
+                        else {
+                        // Default + Warning Case
+                            console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
+                            // If the "alternative interpretation" is forbidden, and imperfection a.p.a. was discarded just because it entered in conflict with rule # 1
+                            // (this is, impapa_against_rule1 flag is True), then we force imperfection a.p.a. as it is the only viable option. But we also raise a 'warning'
+                            // Imperfection a.p.p.
+                            start_note.setAttribute('dur.quality', 'imperfecta');
+                            start_note.setAttribute('num', '3');
+                            start_note.setAttribute('numbase', '2');
+                            // Imperfection a.p.a.
+                            end_note.setAttribute('dur.quality', 'imperfecta');
+                            end_note.setAttribute('num', '3');
+                            end_note.setAttribute('numbase', '2');
+                            // Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
+                            console.log("WARNING 3n + 2! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.");
+                            console.log("The imperfected note is " + end_note + " and is followed by the perfect note " + following_note);
+                            console.log("\n");
+                        }
+                    // If it does not enter in conflict, we go with the "Default interpretation" of the notes
+                    } else {
+                    // Default Case
+                        console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
+                        // Imperfection a.p.p.
+                        start_note.setAttribute('dur.quality', 'imperfecta');
+                        start_note.setAttribute('num', '3');
+                        start_note.setAttribute('numbase', '2');
+                        // Imperfection a.p.a.
+                        end_note.setAttribute('dur.quality', 'imperfecta');
+                        end_note.setAttribute('num', '3');
+                        end_note.setAttribute('numbase', '2');
+                    }
+                }
+
+                else if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))) {
+                // Exception Case
+                    // Alteration
+                    console.log("Alternative Case:  Alteration\n");
+                    last_uncolored_note.setAttribute('dur.quality', 'altera');
+                    last_uncolored_note.setAttribute('num', '1');
+                    last_uncolored_note.setAttribute('numbase', '2');
+                }
+
+                else {// Mistake Case
+                    console.log("MISTAKE 3n + 2 - Imperfections a.p.p. and a.p.a. are impossible - Alteration is also impossible");
+                    console.log(start_note);
+                    console.log(end_note);
+                    console.log("\n");
+                }
+            } break;
 
         case 0:
             break;
     }
 
-    # 2 breves left out:
-    elif counter % 3 == 2:
-
-
-        # 5, 8, 11, 14, 17, 20, ... breves between the longs
-        else:
-            print(last_uncolored_note)
-            # Default Case: Check the conditions to apply the 'default interpretation', which implies imperfection a.p.a.
-            if (start_note is not None and start_note.name == 'note' and start_note.getAttribute('dur').value == long_note and not has_been_modified(start_note) and not followed_by_dot(start_note)) and (end_note is not None and end_note.name == 'note' and end_note.getAttribute('dur').value == long_note and not has_been_modified(end_note) and not followed_by_dot(end_note)):
-                # Check if imperfection a.p.a. enters or not in conflict with rule # 1.
-                if following_note is not None and following_note.getAttribute('dur').value == long_note:
-                    # If it does, imperfection a.p.a. is discarded, except if the "alterantive interpretation" (the 'Exception Case') is also forbidden
-                    # Exception Case
-                    if last_uncolored_note.name == 'note' and last_uncolored_note.getAttribute('dur').value == short_note and not has_been_modified(last_uncolored_note):
-                        # Alteration
-                        last_uncolored_note.addAttribute('quality', 'a')
-                        last_uncolored_note.addAttribute('num', '1')
-                        last_uncolored_note.addAttribute('numbase', '2')
-                    # Default + Warning Case
-                    else:
-                        # If the "alternative interpretation" is forbidden, and imperfection imp. a.p.a. was discarded just because it entered in conflict with rule # 1
-                        # (this is, impapa_against_rule1 flag is True), then we force imperfection a.p.a. as it is the only viable option. But we also raise a 'warning'
-                        # Imperfection a.p.p. 
-                        start_note.addAttribute('quality', 'i')
-                        start_note.addAttribute('num', '3')
-                        start_note.addAttribute('numbase', '2')
-                        # Imperfection a.p.a.
-                        end_note.addAttribute('quality', 'i')
-                        end_note.addAttribute('num', '3')
-                        end_note.addAttribute('numbase', '2')
-                        # Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
-                        print("WARNING 3n + 2! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.")
-                        print("The imperfected note is " + str(end_note) + " and is followed by the perfect note " + str(following_note))
-                        print("")
-                # If it does not enter in conflict, we go with the "Default interpretation" of the notes
-                # Default Case
-                else:
-                    # Imperfection a.p.p. 
-                    start_note.addAttribute('quality', 'i')
-                    start_note.addAttribute('num', '3')
-                    start_note.addAttribute('numbase', '2')
-                    # Imperfection a.p.a.
-                    end_note.addAttribute('quality', 'i')
-                    end_note.addAttribute('num', '3')
-                    end_note.addAttribute('numbase', '2')
-            # Exception Case
-            elif last_uncolored_note.name == 'note' and last_uncolored_note.getAttribute('dur').value == short_note and not has_been_modified(last_uncolored_note):
-                # Alteration
-                last_uncolored_note.addAttribute('quality', 'a')
-                last_uncolored_note.addAttribute('num', '1')
-                last_uncolored_note.addAttribute('numbase', '2')
-            # Mistake Case
-            else:
-                print("MISTAKE 3n + 2 - Imperfections a.p.p. and a.p.a. are impossible - Alteration is also impossible")
-                print(start_note)
-                print(end_note)
-                print("")
     
     # 0 breves left out:
     else:
