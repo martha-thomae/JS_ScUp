@@ -16,13 +16,15 @@ function get_preceding_noterest(target_element) {
     } return preceeding_element;
 }
 
-# Functions related to dots
-def followed_by_dot(target_element):
-    next_element = get_next_element(target_element)
-    if next_element is not None and next_element.name == 'dot':
-        return True
-    else:
-        return False
+// Functions related to dots
+function followed_by_dot(target_element) {
+    var next_element = get_next_element(target_element);
+    if (next_element != null && next_element.tagName == 'dot') {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 def find_first_dotted_note(sequence_of_notes):
     """Return the index of the first dotted note in a sequence of notes"""
