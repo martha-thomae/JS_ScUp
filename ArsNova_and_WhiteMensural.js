@@ -1,38 +1,20 @@
-from pymei import *
-from fractions import *
+/*
+    DURATION FINDER MODULE FOR ARS ANTIQUA
+    Figure out the duration of the notes in the individual <staff> elements.
+*/
+const Fraction = require('fraction.js');
 
-# Functions about preceeding and suceeding elements
-def get_peer_index(target_element):
-    peers = target_element.getPeers()
-    i = 0
-    for element in peers:
-        if element == target_element:
-            index = i
-            break
-        i += 1
-    return [index, peers]
+// Functions about preceeding and suceeding elements
+function get_next_element(target_element) {
+    return target_element.nextSibling;
+}
 
-def get_next_element(target_element):
-    [index, peers] = get_peer_index(target_element)
-    try:
-        next_element = peers[index + 1]
-    except:
-        next_element = None
-    return next_element
-
-def get_preceding_element(target_element):
-    [index, peers] = get_peer_index(target_element)
-    try:
-        preceding_element = peers[index - 1]
-    except:
-        preceding_element = None
-    return preceding_element
-
-def get_preceding_noterest(target_element):
-    preceeding_element = get_preceding_element(target_element)
-    while preceeding_element.name != 'note' and preceeding_element.name != 'rest':
-        preceeding_element = get_preceding_element(preceeding_element)
-    return preceeding_element
+function get_preceding_noterest(target_element) {
+    var preceding_element = target_element.previousSibling;
+    while (preceeding_element.tagName != 'note' && preceeding_element.tagName != 'rest'){
+        preceding_element = preceeding_element.previousSibling;
+    } return preceeding_element;
+}
 
 # Functions related to dots
 def followed_by_dot(target_element):
