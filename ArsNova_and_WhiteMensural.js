@@ -108,8 +108,9 @@ function counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotte
     return minim_counter;
 }
 
-def has_been_modified(note):
-    return (note.hasAttribute('num') and note.hasAttribute('numbase'))
+function has_been_modified(note) {
+    return (note.hasAttribute('num') && note.hasAttribute('numbase'));
+}
 
 # Given the total amount of "breves" in-between the "longs", see if they can be arranged in groups of 3
 # According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
