@@ -267,39 +267,43 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 }
             } break;
 
-        case 0:
-            break;
-    }
+        case 0: // 0 breves left out:
 
-    
-    # 0 breves left out:
-    else:
-        if counter <= 3:
-            pass
-        else:
-            # One of the possibilities when 6,9,12,etc. breves are left out, involves alteration
-            # One must alter the last (uncolored) note from the middle_notes of the sequence
-            # The last middle note is given by:
-            last_middle_note = middle_notes[-1]
-            # If this note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
-            last_uncolored_note = last_middle_note
-            # But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
-            while last_uncolored_note.hasAttribute('colored'):
-                last_uncolored_note = get_preceding_noterest(last_uncolored_note)
-            # Default Case:
-            if (start_note is not None and start_note.name == 'note' and start_note.getAttribute('dur').value == long_note and not has_been_modified(start_note) and not followed_by_dot(start_note)) and (last_uncolored_note.name == 'note' and last_uncolored_note.getAttribute('dur').value == short_note and not has_been_modified(last_uncolored_note)):
-                # Imperfection a.p.p.
-                start_note.addAttribute('quality', 'i')
-                start_note.addAttribute('num', '3')
-                start_note.addAttribute('numbase', '2')
-                # Alteration
-                last_uncolored_note.addAttribute('quality', 'a')
-                last_uncolored_note.addAttribute('num', '1')
-                last_uncolored_note.addAttribute('numbase', '2')
-            # Exception Case:
-            else:
-                # Start note remains perfect
-                pass
+            if (counter <= 3) {
+                // When 0 or 3 breves left out, no modifications to perform
+                console.log("Default Case:\tNo modifications\n");
+            }
+
+            else {
+                // One of the possibilities when 6,9,12,etc. breves are left out, involves alteration
+                // One must alter the last (uncolored) note from the middle_notes of the sequence
+                last_middle_note = middle_notes[middle_notes.length - 1];
+                // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
+                last_uncolored_note = last_middle_note;
+                // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
+                while (last_uncolored_note.hasAttribute('colored')) {
+                    last_uncolored_note = get_preceding_noterest(last_uncolored_note);
+                }
+
+                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))) {
+                // Default Case:
+                    console.log("Default Case:\tImperfection a.p.p. & Alteration\n");
+                    // Imperfection a.p.p.
+                    start_note.setAttribute('dur.quality', 'imperfecta');
+                    start_note.setAttribute('num', '3');
+                    start_note.setAttribute('numbase', '2');
+                    // Alteration
+                    last_uncolored_note.setAttribute('dur.quality', 'altera');
+                    last_uncolored_note.setAttribute('num', '1');
+                    last_uncolored_note.setAttribute('numbase', '2');
+                }
+
+                else {// Exception Case:
+                    console.log("Alternative Case:  No modifications\n");
+                    // Start note remains perfect
+                }
+            } break;
+    }
 }
 
 def minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain):
