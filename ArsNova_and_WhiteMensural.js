@@ -152,7 +152,56 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 console.log("\n");
             } break;
 
-        case 2:
+        case 2: // 2 breves left out:
+            // One of he possibilities when 2 breves are left out, is alteration
+            // One must alter the last (uncolored) note from the middle_notes of the sequence
+            last_middle_note = middle_notes[middle_notes.length - 1];
+            // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
+            last_uncolored_note = last_middle_note;
+            // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
+            while (last_uncolored_note.hasAttribute('colored')){
+                last_uncolored_note = get_preceding_noterest(last_uncolored_note);
+            }
+
+            if (counter == 2) { // 2 exact breves between the longs
+
+                if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))) {
+                // Default case
+                    // Alteration
+                    console.log("Default Case:\tAlteration\n");
+                    last_uncolored_note.setAttribute('dur.quality', 'altera');
+                    last_uncolored_note.setAttribute('num', '1');
+                    last_uncolored_note.setAttribute('numbase', '2');
+                }
+
+                else if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) && (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)) && !(followed_by_dot(end_note)))) {
+                // Exception Case
+                    console.log("Alternative Case:  Imperfection a.p.p. & Imperfection a.p.a.\n");
+                    // Imperfection a.p.p.
+                    start_note.setAttribute('dur.quality', 'imperfecta');
+                    start_note.setAttribute('num', '3');
+                    start_note.setAttribute('numbase', '2');
+                    // Imperfection a.p.a.
+                    end_note.setAttribute('dur.quality', 'imperfecta');
+                    end_note.setAttribute('num', '3');
+                    end_note.setAttribute('numbase', '2');
+                    // Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
+                    if (following_note != null && following_note.getAttribute('dur') == long_note) {
+                        console.log("WARNING 2! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.");
+                        console.log("The imperfected note is " + end_note + " and is followed by the perfect note " + following_note);
+                        console.log("\n");
+                    }
+                }
+
+                else {
+                // Mistake Case
+                    console.log("MISTAKE 2 - Alteration is impossible - Imperfections a.p.p. and a.p.a. are also impossible");
+                    console.log(start_note);
+                    console.log(end_note);
+                    console.log("\n");
+                }
+
+            }
             break;
 
         case 0:
@@ -161,44 +210,8 @@ function modification(counter, start_note, middle_notes, end_note, following_not
 
     # 2 breves left out:
     elif counter % 3 == 2:
-        # One of he possibilities when 2 breves are left out, is alteration
-        # One must alter the last (uncolored) note from the middle_notes of the sequence
-        # The last middle note is given by:
-        last_middle_note = middle_notes[-1]
-        # If this note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
-        last_uncolored_note = last_middle_note
-        # But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
-        while last_uncolored_note.hasAttribute('colored'):
-            last_uncolored_note = get_preceding_noterest(last_uncolored_note)
-        # 2 exact breves between the longs
-        if counter == 2:
-            # Default case
-            if last_uncolored_note.name == 'note' and last_uncolored_note.getAttribute('dur').value == short_note and not has_been_modified(last_uncolored_note):
-                # Alteration
-                last_uncolored_note.addAttribute('quality', 'a')
-                last_uncolored_note.addAttribute('num', '1')
-                last_uncolored_note.addAttribute('numbase', '2')
-            # Exception Case
-            elif (start_note is not None and start_note.name == 'note' and start_note.getAttribute('dur').value == long_note and not has_been_modified(start_note) and not followed_by_dot(start_note)) and (end_note is not None and end_note.name == 'note' and end_note.getAttribute('dur').value == long_note and not has_been_modified(end_note) and not followed_by_dot(end_note)):
-                # Imperfection a.p.p. 
-                start_note.addAttribute('quality', 'i')
-                start_note.addAttribute('num', '3')
-                start_note.addAttribute('numbase', '2')
-                # Imperfection a.p.a.
-                end_note.addAttribute('quality', 'i')
-                end_note.addAttribute('num', '3')
-                end_note.addAttribute('numbase', '2')
-                # Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
-                if following_note is not None and following_note.getAttribute('dur').value == long_note:
-                    print("WARNING 2! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.")
-                    print("The imperfected note is " + str(end_note) + " and is followed by the perfect note " + str(following_note))
-                    print("")
-            # Mistake Case
-            else:
-                print("MISTAKE 2 - Alteration is impossible - Imperfections a.p.p. and a.p.a. are also impossible")
-                print(start_note)
-                print(end_note)
-                print("")
+
+
         # 5, 8, 11, 14, 17, 20, ... breves between the longs
         else:
             print(last_uncolored_note)
