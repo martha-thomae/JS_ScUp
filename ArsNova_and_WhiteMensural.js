@@ -49,7 +49,7 @@ function counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, u
         dur = note.getAttribute('dur');
         try {
             index = note_durs.indexOf(dur);
-        } catch (err) {
+        } catch(err) {
             console.log("MISTAKE\nNote/Rest element not considered: " + note + ", with a duration @dur = " + dur);
         }
         gain = undotted_note_gain[index];
@@ -63,47 +63,50 @@ function counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, u
     return minim_counter;
 }
 
-def counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio = None, tempus = None, modusminor = None, modusmaior = None):
-    minim_counter = 0
-    print ""
-    for note in sequence_of_notes:
-        dur = note.getAttribute('dur').value
-        try:
-            index = note_durs.index(dur)
-        except:
-            print("MISTAKE\nNote/Rest element not considered: " + str(note) + ", with a duration @dur = " + dur)
-        # Defining the gain in case of dotted or undotted notes:
-        if followed_by_dot(note):
-            gain = dotted_note_gain[index]
-            # This dot could be either of perfection or of augmentation. 
-            # In the case of a dot of perfection there is no need to do anything, as the note value is kept perfect.
-            # In the case of a dot of augmentation, the note value should be changed from imperfect to perfect.
-            if (index == 4 and prolatio == 2) or (index == 5 and tempus == 2) or (index == 6 and modusminor == 2) or (index == 7 and modusmaior == 2) or (index < 4):
-            ## NOTE TO SELF: ##
-            #### Right now index == 1, is the index of prolatio. ####
-            #### If later I put prolatio in a higher index like n, ####
-            #### the information in this if should change accordingly. ####
-                # Case: Dot of Augmentation
-                # Encode the augmentation dot
-                dot_element = get_next_element(note)
-                dot_element.addAttribute('form', 'aug')
-                # Perform the augmentation, multiply the note value by 1.5
-                note.addAttribute('num', '2')
-                note.addAttribute('numbase', '3')
-                # Thus the default "imperfect" note, becomes a perfect note
-                note.addAttribute('quality', 'p')
-            else:
-                pass
-        else:
-            gain = undotted_note_gain[index]
-            if note.hasAttribute('num') and note.hasAttribute('numbase'):
-                ratio = Fraction(int(note.getAttribute('numbase').value), int(note.getAttribute('num').value))
-                gain *= ratio
-            else:
-                pass
-        minim_counter += gain
-        print(dur + ", " + str(gain) + ", " + str(minim_counter))
-    return minim_counter
+function counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio = None, tempus = None, modusminor = None, modusmaior = None) {
+    var minim_counter, note, dur, index, gain, ratio;
+    minim_counter = 0;
+    console.log('@dur\t\tCounter (m)\tAccumulator (m)');
+    for (note of sequence_of_notes) {
+        dur = note.getAttribute('dur');
+        try {
+            index = note_durs.indexOf(dur);
+        } catch(err) {
+            console.log("MISTAKE\nNote/Rest element not considered: " + note + ", with a duration @dur = " + dur);
+        }
+        // Defining the gain in case of dotted or undotted notes:
+        if (followed_by_dot(note)) {
+            gain = dotted_note_gain[index];
+            // This dot could be either of perfection or of augmentation.
+            // In the case of a dot of perfection there is no need to do anything, as the note value is kept perfect.
+            // In the case of a dot of augmentation, the note value should be changed from imperfect to perfect.
+            if ((index == 4 && prolatio == 2) || (index == 5 && tempus == 2) || (index == 6 && modusminor == 2) || (index == 7 && modusmaior == 2) || (index < 4)) {
+            //// NOTE TO SELF: ////
+            //////// Right now index == 1, is the index of prolatio. ////////
+            //////// If later I put prolatio in a higher index like n, ////////
+            //////// the information in this if should change accordingly. ////////
+                // Case: Dot of Augmentation
+                // Encode the augmentation dot
+                dot_element = get_next_element(note);
+                dot_element.setAttribute('form', 'aug');
+                // Perform the augmentation, multiply the note value by 1.5
+                note.setAttribute('num', '2');
+                note.setAttribute('numbase', '3');
+                // Thus the default "imperfect" note, becomes a perfect note
+                note.setAttribute('dur.quality', 'perfecta');
+            }
+        } else {
+            gain = undotted_note_gain[index];
+            if (note.hasAttribute('num') && note.hasAttribute('numbase')) {
+                ratio = new Fraction([note.getAttribute('numbase'), note.getAttribute('num').value]);
+                gain = ratio.mul(gain);
+            }
+        }
+        minim_counter += gain;
+        console.log(dur + Array(10-dur.length).join(' ') + "\t" + gain + "\t\t" + minim_counter);
+    }
+    return minim_counter;
+}
 
 def has_been_modified(note):
     return (note.hasAttribute('num') and note.hasAttribute('numbase'))
