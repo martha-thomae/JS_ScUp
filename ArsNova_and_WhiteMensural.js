@@ -306,107 +306,115 @@ function modification(counter, start_note, middle_notes, end_note, following_not
     }
 }
 
-def minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain):
-    no_division_dot_flag = True    # Default value
-    sequence = [start_note] + middle_notes
-    first_dotted_note_index = find_first_dotted_note(sequence)
+function minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain) {
+    var no_division_dot_flag = true;    // Default value
+    var sequence = [start_note].concat(middle_notes);
+    var first_dotted_note_index = find_first_dotted_note(sequence);
+    var minim_counter, dot_element, first_dotted_note, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, dur, first_dotted_note_default_gain;
 
-    # If first_dotted_note_index == -1, then there is no dot in the sequence at all
-    if first_dotted_note_index == -1:
-        # Getting the total of minims in the middle_notes
-        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain)
-        #print('No-dot\n')
+    // If first_dotted_note_index == -1, then there is no dot in the sequence at all
+    if (first_dotted_note_index == -1) {
+        // Getting the total of minims in the middle_notes
+        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+        console.log('No-dot\n');
+    }
 
-    # If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
-    elif first_dotted_note_index == 0:
-        # DOT OF PERFECTION
-        dot_element = get_next_element(start_note)
-        dot_element.addAttribute('form', 'perf')
-        #print('Perfection\n')
-        # Getting the total of minims in the middle_notes
-        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain)
+    // If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
+    else if (first_dotted_note_index == 0) {
+        // DOT OF PERFECTION
+        dot_element = get_next_element(start_note);
+        dot_element.setAttribute('form', 'div');
+        // console.log('Perfection\n');
+        // Getting the total of minims in the middle_notes
+        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain);
+    }
 
-    # Otherwise, if the dot is in any middle note:
-    else:
-        first_dotted_note = sequence[first_dotted_note_index]######################################
-        dot_element = get_next_element(first_dotted_note)
-        if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'aug':
-            #If the first dot is an already known dot of augmentation
-            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain)
-        else:
-            # We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
-            # Then count the number of minims in each of the two parts to discover if this 'dot' is a 
-            # 'dot of division' or a 'dot of addition'
-            part1_middle_notes = sequence[1 : first_dotted_note_index + 1]
-            part2_middle_notes = sequence[first_dotted_note_index + 1 : len(sequence)]
+    //Otherwise, if the dot is in any middle note:
+    else {
+        first_dotted_note = sequence[first_dotted_note_index]; ////////////////////////////////////////
+        dot_element = get_next_element(first_dotted_note);
+        if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug') {
+            // If the first dot is an already known dot of augmentation
+            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain);
+        } else {
+            // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
+            // Then count the number of minims in each of the two parts to discover if this 'dot' is a
+            // 'dot of division' or a 'dot of addition'
+            part1_middle_notes = sequence.slice(1, first_dotted_note_index + 1);
+            part2_middle_notes = sequence.slice(first_dotted_note_index + 1, sequence.length);
 
-            # Minims BEFORE the first dot
-            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain)
+            // Minims BEFORE the first dot
+            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain);
 
-            # The individual value of the first dotted note (the last note in the sequence preceding the dot)
-            dur = first_dotted_note.getAttribute('dur').value
-            first_dotted_note_default_gain = undotted_note_gain[note_durs.index(dur)]
-            #print("Notes in the Sequence preceeding this dot " + str(part1_middle_notes))
-            #print("FIRST DOTTED NOTE: " + str(first_dotted_note) + ", with duration of: " + dur + ", which gain is: " + str(first_dotted_note_default_gain))
+            // The individual value of the first dotted note (the last note in the sequence preceding the dot)
+            dur = first_dotted_note.getAttribute('dur');
+            first_dotted_note_default_gain = undotted_note_gain[note_durs.index(dur)];
+            // console.log("Notes in the Sequence preceeding this dot " + part1_middle_notes);
+            // console.log("FIRST DOTTED NOTE: " + first_dotted_note + ", with duration of: " + dur + ", which gain is: " + first_dotted_note_default_gain);
 
-            # Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
-            # Count the number of minims in the second part of the sequence of middle_notes
-            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain)
-
-
-            # If there is just one minim before the first dot
-            if minim_counter1 == 1:
-                # Two possibilities: dot of division / dot of augmentation
-                # We have to use the results of the second part of the middle notes (part2_middle_notes) to figure this out
-
-                # If the number of minims after the dot is an integer number
-                if minim_counter2 == int(minim_counter2):
-                    # DOT OF DIVISION
-                    no_division_dot_flag = False
-                    #print('Imperfection app\n')
-                    dot_element.addAttribute('form', 'div')
-                    minim_counter = minim_counter1 + minim_counter2
-                    # Total of minims in the middle_notes
-                    modification(minim_counter1, start_note, part1_middle_notes, None, None, 'minima', 'semibrevis')
-                    modification(minim_counter2, None, part2_middle_notes, end_note, following_note, 'minima', 'semibrevis')
-                else:
-                    # DOT OF AUGMENTATION
-                    #print('Augmentation_typeI\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
-                    pass
-
-            # If there is more than one minim before the first dot, it is impossible for that dot to be a 'dot of division'
-            else:
-                # DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
-                if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'perf':
-                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain)
-                    pass
-                else:
-                    #print('Augmentation_def\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
-                    pass
+            // Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
+            // Count the number of minims in the second part of the sequence of middle_notes
+            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain);
 
 
-    if no_division_dot_flag:
-        # Checking that the sequence of notes is fine, and then calling the modification function
-        if(minim_counter == int(minim_counter)):
-            #print("GOOD")
-            pass
-        else:
-            print("BAD! Not an integer number of Minimas!")
-            print([start_note] + middle_notes + [end_note])
-            print("Minimas: " + str(minim_counter))
-        # Given the total amount of minims in-between the "semibreves", see if they can be arranged in groups of 3
-        # According to how many minims remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-        modification(minim_counter, start_note, middle_notes, end_note, following_note, 'minima', 'semibrevis')
+            // If there is just one minim before the first dot
+            if( minim_counter1 == 1) {
+                // Two possibilities: dot of division / dot of augmentation
+                // We have to use the results of the second part of the middle notes (part2_middle_notes) to figure this out
+
+                // If the number of minims after the dot is an integer number
+                if (minim_counter2 == Math.floor(minim_counter2)) {
+                    // DOT OF DIVISION
+                    no_division_dot_flag = false;
+                    // console.log('Imperfection app\n');
+                    dot_element.setAttribute('form', 'div');
+                    minim_counter = minim_counter1 + minim_counter2;
+                    // Total of minims in the middle_notes
+                    modification(minim_counter1, start_note, part1_middle_notes, null, null, 'minima', 'semibrevis');
+                    modification(minim_counter2, null, part2_middle_notes, end_note, following_note, 'minima', 'semibrevis');
+                }
+                else {
+                    // DOT OF AUGMENTATION
+                    // console.log('Augmentation_typeI\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
+
+            // If there is more than one minim before the first dot, it is impossible for that dot to be a 'dot of division'
+            else {
+                // DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
+                if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'perf') {
+                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain);
+                } else {
+                    // console.log('Augmentation_def\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
+        }
+    }
+
+    if (no_division_dot_flag) {
+        // Checking that the sequence of notes is fine, and then calling the modification function
+        if(minim_counter == Math.floor(minim_counter)) {
+            // console.log("GOOD");
+        } else {
+            console.log("BAD! Not an integer number of Minimas!");
+            console.log(([start_note].concat(middle_notes)).concat(end_note));
+            console.log("Minimas: " + minim_counter);
+        }
+        // Given the total amount of minims in-between the "semibreves", see if they can be arranged in groups of 3
+        // According to how many minims remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
+        modification(minim_counter, start_note, middle_notes, end_note, following_note, 'minima', 'semibrevis');
+    }
+}
 
 def sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain):
     no_division_dot_flag = True    # Default value
