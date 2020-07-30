@@ -652,24 +652,31 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     }
 }
 
-def find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, colored_figures):
-    # Determine the note-level at which coloration is working (i.e., the perfect note it is meant to imperfect)
-    # If a maxima is colored, and the default value of the maxima is 3 (modusmaior = 3), then the coloration is working at the level of the maxima
-    if modusmaior == 3 and "maxima" in colored_figures:
-        coloration_level = "Max"
-    # If a longa is colored, and the default value of the longa is 3 (modusminor = 3), then the coloration is working at the level of the longa
-    elif modusminor == 3 and ("longa" in colored_figures or "maxima" in colored_figures):
-        coloration_level = "L"
-    # If a breve is colored, and the default value of the breve is 3 (tempus = 3), then the coloration is working at the level of the breve
-    elif tempus == 3 and ("brevis" in colored_figures or "longa" in colored_figures or "maxima" in colored_figures):
-        coloration_level = "B"
-    # If a semibreve is colored, and the default value of the semibreve is 3 (prolatio = 3), then the coloration is working at the level of the semibreve
-    elif prolatio == 3 and ("semibrevis" in colored_figures or "brevis" in colored_figures or "longa" in colored_figures or "maxima" in colored_figures):
-        coloration_level = "Sb"
-    # Coloration can only work at these 4 levels, as only these four notes (i.e., maxima, longa, breve, and semibreve) can be perfect (i.e., have triple values)
-    else:
-        coloration_level = None
-    return coloration_level
+function find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, colored_figures) {
+    // Determine the note-level at which coloration is working (i.e., the perfect note it is meant to imperfect)
+    var coloration_level;
+    // If a maxima is colored, and the default value of the maxima is 3 (modusmaior = 3), then the coloration is working at the level of the maxima
+    if (modusmaior == 3 && colored_figures.includes("maxima")) {
+        coloration_level = "Max";
+    }
+    // If a longa is colored, and the default value of the longa is 3 (modusminor = 3), then the coloration is working at the level of the longa
+    else if (modusminor == 3 && (colored_figures.includes("longa") || colored_figures.includes("maxima"))) {
+        coloration_level = "L";
+    }
+    // If a breve is colored, and the default value of the breve is 3 (tempus = 3), then the coloration is working at the level of the breve
+    else if (tempus == 3 && (colored_figures.includes("brevis") || colored_figures.includes("longa") || colored_figures.includes("maxima"))) {
+        coloration_level = "B";
+    }
+    // If a semibreve is colored, and the default value of the semibreve is 3 (prolatio = 3), then the coloration is working at the level of the semibreve
+    else if (prolatio == 3 && (colored_figures.includes("semibrevis") || colored_figures.includes("brevis") || colored_figures.includes("longa") || colored_figures.includes("maxima"))) {
+        coloration_level = "Sb";
+    }
+    // Coloration can only work at these 4 levels, as only these four notes (i.e., maxima, longa, breve, and semibreve) can be perfect (i.e., have triple values)
+    else {
+        coloration_level = None;
+    }
+    return coloration_level;
+}
 
 def get_colored_notes_and_rests(noterest_sequence):
     # List to store all the <note> and <rest> elements that have coloration
