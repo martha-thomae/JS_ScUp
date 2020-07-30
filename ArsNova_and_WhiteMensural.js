@@ -323,7 +323,7 @@ function minims_between_semibreves(start_note, middle_notes, end_note, following
     else if (first_dotted_note_index == 0) {
         // DOT OF PERFECTION
         dot_element = get_next_element(start_note);
-        dot_element.setAttribute('form', 'div');
+        dot_element.setAttribute('form', 'perf');
         // console.log('Perfection\n');
         // Getting the total of minims in the middle_notes
         minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain);
