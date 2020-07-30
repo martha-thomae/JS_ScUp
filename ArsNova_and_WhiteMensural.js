@@ -699,72 +699,73 @@ function get_colored_notes_and_rests(noterest_sequence) {
     return [colored_notes_and_rests, colored_durs];
 }
 
-def coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, tempus, prolatio):
-    """
-        Apply the effect of coloration once found the note-level that coloration is working at.
-    """
-    # This is done basically by multiplying by 2/3 the duration of all notes equal or larger than the coloration's note-level,
-    # and keeping the values of the smaller colored notes the same as their original (uncolored) note values.
+function coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, tempus, prolatio) {
+    // Apply the effect of coloration once found the note-level that coloration is working at.
     
-    # Get the list of colored <note> and <rest> elements
-    colored_notes, durs_of_colored_notes = get_colored_notes_and_rests(notes_and_rests_per_voice)
-    # Get the note-level at which the coloration is working (i.e., the perect note it is meant to imperfect)
-    coloration_level = find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, durs_of_colored_notes)
-    print("Coloration level: " + str(coloration_level))
-
-    # Given the note-level of the coloration (e.g., the breve), this note must be imperfect when colored.
-    # For example: The colored breve is 2/3 the value of the uncolored breve, thus the former will have a @num = 3 and @numbase = 2.
-
-    # Colored notes shorter than the note-level of the coloration will keep their original (uncolored) value.
-    # Example continuation: Colored semibreves = uncolored semibreves, thus the former won't have any extra @num and @numbase attributes.
-
-    # Colored notes larger than the note-level of the coloration, will remain perfect or imperfect as their uncolored versions,
-    # but their total value will change since now they will be made up of imperfect (colored) units instead of perfect.
-    # Example continuation: An uncolored long that is imperfect, normally consists of 2 PERFECT breves; the colored long, while still
-    # imperfect, now consists of 2 IMPERFECT (COLORED) breves, thus its total duration changes: 
-    # colored_long = 2 x colored_breve = 2 x (2/3 x uncolored_breve)= 2/3 x (2 x uncolored_breve) = 2/3 x uncolored_long
-    # The same happens with the maxima. Thus, the longa and the maxima will have @num = 2 and @numbase = 2.
+    // This is done basically by multiplying by 2/3 the duration of all notes equal or larger than the coloration's note-level,
+    // and keeping the values of the smaller colored notes the same as their original (uncolored) note values.
     
-    if coloration_level == "Max":
-        for note in colored_notes:
-            # Multiplying the duration of the coloration's note-level and larger levels by 2/3
-            if note.getAttribute('dur').value == "maxima":
-                note.addAttribute('num', '3')
-                note.addAttribute('numbase', '2')
-            # For smaller notes, do nothing
-            else:
-                pass
-    elif coloration_level == "L":
-        for note in colored_notes:
-            # Multiplying the duration of the coloration's note-level and larger levels by 2/3
-            if note.getAttribute('dur').value == "longa" or note.getAttribute('dur').value == "maxima":
-                note.addAttribute('num', '3')
-                note.addAttribute('numbase', '2')
-            # For smaller notes, do nothing
-            else:
-                pass
-    elif coloration_level == "B":
-        for note in colored_notes:
-            # Multiplying the duration of the coloration's note-level and larger levels by 2/3
-            if note.getAttribute('dur').value == "brevis" or note.getAttribute('dur').value == "longa" or note.getAttribute('dur').value == "maxima":
-                note.addAttribute('num', '3')
-                note.addAttribute('numbase', '2')
-            # For smaller notes, do nothing
-            else:
-                pass
-    elif coloration_level == "Sb":
-        for note in colored_notes:
-            # Multiplying the duration of the coloration's note-level and larger levels by 2/3
-            if note.getAttribute('dur').value == "semibrevis" or note.getAttribute('dur').value == "brevis" or note.getAttribute('dur').value == "longa" or note.getAttribute('dur').value == "maxima":
-                note.addAttribute('num', '3')
-                note.addAttribute('numbase', '2')
-            # For smaller notes, do nothing
-            else:
-                pass
-    else:
-        for note in colored_notes:
-            note.addAttribute('num', '3')
-            note.addAttribute('numbase', '2')
+    // Get the list of colored <note> and <rest> elements
+    var colored_notes, durs_of_colored_notes = get_colored_notes_and_rests(notes_and_rests_per_voice);
+    // Get the note-level at which the coloration is working (i.e., the perect note it is meant to imperfect)
+    var coloration_level = find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, durs_of_colored_notes);
+    console.log("Coloration level: " + str(coloration_level));
+
+    // Given the note-level of the coloration (e.g., the breve), this note must be imperfect when colored.
+    // For example: The colored breve is 2/3 the value of the uncolored breve, thus the former will have a @num = 3 and @numbase = 2.
+
+    // Colored notes shorter than the note-level of the coloration will keep their original (uncolored) value.
+    // Example continuation: Colored semibreves = uncolored semibreves, thus the former won't have any extra @num and @numbase attributes.
+
+    // Colored notes larger than the note-level of the coloration, will remain perfect or imperfect as their uncolored versions,
+    // but their total value will change since now they will be made up of imperfect (colored) units instead of perfect.
+    // Example continuation: An uncolored long that is imperfect, normally consists of 2 PERFECT breves; the colored long, while still
+    // imperfect, now consists of 2 IMPERFECT (COLORED) breves, thus its total duration changes:
+    // colored_long = 2 x colored_breve = 2 x (2/3 x uncolored_breve)= 2/3 x (2 x uncolored_breve) = 2/3 x uncolored_long
+    // The same happens with the maxima. Thus, the longa and the maxima will have @num = 2 and @numbase = 2.
+
+    if (coloration_level == "Max") {
+        for (var note of colored_notes) {
+            // Multiplying the duration of the coloration's note-level and larger levels by 2/3
+            if (note.getAttribute('dur') == "maxima") {
+                note.setAttribute('num', '3');
+                note.setAttribute('numbase', '2');
+            } // For smaller notes, do nothing
+        }
+    } else if (coloration_level == "L") {
+        for (var note of colored_notes) {
+            // Multiplying the duration of the coloration's note-level and larger levels by 2/3
+            if (note.getAttribute('dur') == "longa" || note.getAttribute('dur') == "maxima") {
+                note.setAttribute('num', '3');
+                note.setAttribute('numbase', '2');
+            } // For smaller notes, do nothing
+        }
+    }
+    else if (coloration_level == "B") {
+        for (var note of colored_notes) {
+            // Multiplying the duration of the coloration's note-level and larger levels by 2/3
+            if (note.getAttribute('dur') == "brevis" || note.getAttribute('dur') == "longa" || note.getAttribute('dur') == "maxima") {
+                note.setAttribute('num', '3');
+                note.setAttribute('numbase', '2');
+            } // For smaller notes, do nothing
+        }
+    }
+    else if (coloration_level == "Sb") {
+        for (var note of colored_notes) {
+            // Multiplying the duration of the coloration's note-level and larger levels by 2/3
+            if (note.getAttribute('dur') == "semibrevis" || note.getAttribute('dur') == "brevis" || note.getAttribute('dur') == "longa" || note.getAttribute('dur') == "maxima") {
+                note.setAttribute('num', '3');
+                note.setAttribute('numbase', '2');
+            } // For smaller notes, do nothing
+        }
+    }
+    else {
+        for (var note of colored_notes) {
+            note.setAttribute('num', '3');
+            note.setAttribute('numbase', '2');
+        }
+    }
+}
 
 # Main function
 def lining_up(quasiscore_mensural_doc):
