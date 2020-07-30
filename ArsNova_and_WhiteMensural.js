@@ -489,8 +489,8 @@ function sb_between_breves(start_note, middle_notes, end_note, following_note, p
                     dot_element.setAttribute('form', 'div');
                     minim_counter = minim_counter1 + minim_counter2;
                     // Total of semibreves in the middle_notes
-                    modification(part1_count_Sb, start_note, part1_middle_notes, None, None, 'semibrevis', 'brevis');
-                    modification(part2_count_Sb, None, part2_middle_notes, end_note, following_note, 'semibrevis', 'brevis');
+                    modification(part1_count_Sb, start_note, part1_middle_notes, null, null, 'semibrevis', 'brevis');
+                    modification(part2_count_Sb, null, part2_middle_notes, end_note, following_note, 'semibrevis', 'brevis');
                 } else {
                     // DOT OF AUGMENTATION
                     // console.log('Augmentation_typeI\n');
@@ -605,8 +605,8 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
                     dot_element.setAttribute('form', 'div');
                     minim_counter = minim_counter1 + minim_counter2;
                     // Total of breves in the middle_notes
-                    modification(part1_count_B, start_note, part1_middle_notes, None, None, 'brevis', 'longa');
-                    modification(part2_count_B, None, part2_middle_notes, end_note, following_note, 'brevis', 'longa');
+                    modification(part1_count_B, start_note, part1_middle_notes, null, null, 'brevis', 'longa');
+                    modification(part2_count_B, null, part2_middle_notes, end_note, following_note, 'brevis', 'longa');
                 } else {
                     // DOT OF AUGMENTATION
                     // console.log('Augmentation_typeI\n');
@@ -673,7 +673,7 @@ function find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio,
     }
     // Coloration can only work at these 4 levels, as only these four notes (i.e., maxima, longa, breve, and semibreve) can be perfect (i.e., have triple values)
     else {
-        coloration_level = None;
+        coloration_level = null;
     }
     return coloration_level;
 }
