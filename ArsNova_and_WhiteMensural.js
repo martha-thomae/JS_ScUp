@@ -1002,45 +1002,74 @@ function lining_up(quasiscore_mensural_doc) {
             // tempus = 2
         }
 
-        // Breves in between longas (or higher note values)
-        if modusminor == 3:
-            #print("\nLONGA GEQ")
-            #print(list_of_indices_geq_L)
-            #print ""
 
-            if 0 not in list_of_indices_geq_L and list_of_indices_geq_L != []:
-                start_note = None
-                f = list_of_indices_geq_L[0]
-                end_note = voice_noterest_content[f]
-                try:
-                    following_note = voice_noterest_content[f+1]
-                except:
-                    following_note = None
-                middle_notes = voice_noterest_content[0:f]
-                #print(start_note)
-                #print(middle_notes)
-                #print(end_note)
-                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain)
+        // PROCESSING OF BREVES AND LONGAS (DEPENDING ON THE VALUE OF @MODUSMINOR)
+        // SEQUENCES OF BREVES DELIMITED BY LONGAS (OR HIGHER NOTE VALUES)
 
-            for i in range(0, len(list_of_indices_geq_L)-1):
-                # Define the sequence of notes
-                o = list_of_indices_geq_L[i]
-                start_note = voice_noterest_content[o]
-                f = list_of_indices_geq_L[i+1]
-                end_note = voice_noterest_content[f]
-                try:
-                    following_note = voice_noterest_content[f+1]
-                except:
-                    following_note = None
-                middle_notes = voice_noterest_content[o+1:f]
-                #print(start_note)
-                #print(middle_notes)
-                #print(end_note)
-                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain)
+        //console("\nLONGA GEQ");
+        //console(list_of_indices_geq_L + "\n");
 
-        # modusminor = 2
-        else:
-            pass
+        if (modusminor == 3) {
+
+            if (!(list_of_indices_geq_L.includes(0)) && list_of_indices_geq_L.length != 0) {
+                start_note = null;
+                f = list_of_indices_geq_L[0];
+                end_note = voice_noterest_content[f];
+                try {
+                    following_note = voice_noterest_content[f+1];
+                } catch(err) {
+                    following_note = null;
+                }
+                middle_notes = voice_noterest_content.slice(0, f);
+                /*
+                //DEBUG:
+                var s = null;
+                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+                */
+                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
+            }
+
+            for (var j = 0; j < llist_of_indices_geq_L.length-1; j++) {
+                // Define the sequence of notes
+                o = list_of_indices_geq_L[j];
+                start_note = voice_noterest_content[o];
+                f = list_of_indices_geq_L[j+1];
+                end_note = voice_noterest_content[f];
+                try {
+                    following_note = voice_noterest_content[f+1];
+                } catch(err) {
+                    following_note = null;
+                }
+                middle_notes = voice_noterest_content.slice(o+1, f);
+                /*
+                //DEBUG:
+                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);*/
+                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
+            }
+        }
+
+        else {
+            // modusminor = 2
+        }
 
 
         # There are notes that, when dotted, the dot used must be a dot of augmentation
