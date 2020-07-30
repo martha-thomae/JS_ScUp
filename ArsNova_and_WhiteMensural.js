@@ -768,7 +768,7 @@ function coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, te
 }
 
 // Main function
-function lining_up(quasiscore_mensural_doc) {
+const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
     var staves = quasiscore_mensural_doc.getElementsByTagName('staff');
     var stavesDef = quasiscore_mensural_doc.getElementsByTagName('staffDef');
@@ -1152,4 +1152,6 @@ function lining_up(quasiscore_mensural_doc) {
     }
 
     return quasiscore_mensural_doc;
-}
+};
+
+exports.lining_up = lining_up;
