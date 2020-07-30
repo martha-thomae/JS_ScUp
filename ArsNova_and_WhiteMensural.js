@@ -678,22 +678,26 @@ function find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio,
     return coloration_level;
 }
 
-def get_colored_notes_and_rests(noterest_sequence):
-    # List to store all the <note> and <rest> elements that have coloration
-    colored_notes_and_rests = []
-    # List to store the value (@dur) of these colored <note> and <rest> elements
-    colored_durs = []
-    for noterest in noterest_sequence:
-        # Find out if the note or rest is colored
-        if noterest.hasAttribute('colored'):
-            colored_notes_and_rests.append(noterest)
-            # Fill the colroed_durs list with the duration (@dur) of these colored <note> and <rest> elements
-            dur = noterest.getAttribute('dur').value
-            if dur not in colored_durs:
-                colored_durs.append(dur)
-                print(dur)
-    # Return both the list of all the colored notes and rests, and the list of the figuras (i.e., note shapes or @dur values) of these colored notes and rests
-    return [colored_notes_and_rests, colored_durs]
+function get_colored_notes_and_rests(noterest_sequence) {
+    // List to store all the <note> and <rest> elements that have coloration
+    var colored_notes_and_rests = [];
+    // List to store the value (@dur) of these colored <note> and <rest> elements
+    var colored_durs = [];
+    for (var noterest of noterest_sequence) {
+        // Find out if the note or rest is colored
+        if (noterest.hasAttribute('colored')) {
+            colored_notes_and_rests.push(noterest);
+            // Fill the colroed_durs list with the duration (@dur) of these colored <note> and <rest> elements
+            var dur = noterest.getAttribute('dur');
+            if(!(colored_durs.includes(dur))) {
+                colored_durs.push(dur);
+                console.log(dur);
+            }
+        }
+    }
+    // Return both the list of all the colored notes and rests, and the list of the figuras (i.e., note shapes or @dur values) of these colored notes and rests
+    return [colored_notes_and_rests, colored_durs];
+}
 
 def coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, tempus, prolatio):
     """
