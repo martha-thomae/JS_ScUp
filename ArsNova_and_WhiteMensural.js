@@ -537,110 +537,120 @@ function sb_between_breves(start_note, middle_notes, end_note, following_note, p
     }
 }
 
-def breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain):
-    no_division_dot_flag = True    # Default value
-    sequence = [start_note] + middle_notes
-    first_dotted_note_index = find_first_dotted_note(sequence)
+function breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
+    no_division_dot_flag = true;    // Default value
+    var sequence = [start_note].concat(middle_notes);
+    var first_dotted_note_index = find_first_dotted_note(sequence);
+    var dur, minim_counter, count_B, dot_element, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, part1_count_B, part2_count_B;
+    var first_dotted_note, first_dotted_note_default_gain;
 
-    # If first_dotted_note_index == -1, then there is no dot in the sequence at all
-    if first_dotted_note_index == -1:
-        # Total of breves in the middle_notes
-        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain)
-        count_B = minim_counter / (tempus * prolatio)
-        #print('No-dot\n')
+    // If first_dotted_note_index == -1, then there is no dot in the sequence at all
+    if (first_dotted_note_index == -1) {
+        // Total of breves in the middle_notes
+        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+        count_B = minim_counter / (tempus * prolatio);
+        // console.log('No-dot\n');
+    }
 
-    # If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
-    elif first_dotted_note_index == 0:
-        # DOT OF PERFECTION
-        dot_element = get_next_element(start_note)
-        dot_element.addAttribute('form', 'perf')
-        #print('Perfection\n')
-        # Total of breves in the middle_notes
-        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus)
-        count_B = minim_counter / (tempus * prolatio)
+    // If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
+    else if (first_dotted_note_index == 0) {
+        // DOT OF PERFECTION
+        dot_element = get_next_element(start_note);
+        dot_element.setAttribute('form', 'perf');
+        // console.log('Perfection\n');
+        // Total of breves in the middle_notes
+        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
+        count_B = minim_counter / (tempus * prolatio);
+    }
 
-    # Otherwise, if the dot is in any middle note:
-    else:
-        first_dotted_note = sequence[first_dotted_note_index]######################################
-        dot_element = get_next_element(first_dotted_note)
-        if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'aug':
-            #If the first dot is an already known dot of augmentation
-            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus)
-            count_B = minim_counter / (tempus * prolatio)
-        else:
-            # We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
-            # Then count the number of breves in each of the two parts to discover if this 'dot' is a 
-            # 'dot of division' or a 'dot of addition'
-            part1_middle_notes = sequence[1 : first_dotted_note_index + 1]
-            part2_middle_notes = sequence[first_dotted_note_index + 1 : len(sequence)]
+    // Otherwise, if the dot is in any middle note:
+    else {
+        first_dotted_note = sequence[first_dotted_note_index];////////////////////////////////////////
+        dot_element = get_next_element(first_dotted_note);
+        if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug'){
+            //If the first dot is an already known dot of augmentation
+            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
+            count_B = minim_counter / (tempus * prolatio);
+        } else {
+            // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
+            // Then count the number of breves in each of the two parts to discover if this 'dot' is a
+            // 'dot of division' or a 'dot of addition'
+            part1_middle_notes = sequence.slice(1, first_dotted_note_index + 1);
+            part2_middle_notes = sequence.slice(first_dotted_note_index + 1, sequence.length);
 
-            # Breves BEFORE the first dot
-            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain)
-            part1_count_B = minim_counter1 / float(tempus*prolatio)
+            // Breves BEFORE the first dot
+            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain);
+            part1_count_B = minim_counter1 / (tempus*prolatio);
             
-            # The individual value of the first dotted note (the last note in the sequence preceding the dot)
-            first_dotted_note = part1_middle_notes[-1]
-            dur = first_dotted_note.getAttribute('dur').value
-            first_dotted_note_default_gain = undotted_note_gain[note_durs.index(dur)]
+            // The individual value of the first dotted note (the last note in the sequence preceding the dot)
+            first_dotted_note = part1_middle_notes[-1];
+            dur = first_dotted_note.getAttribute('dur');
+            first_dotted_note_default_gain = undotted_note_gain[note_durs.indexOf(dur)];
 
-            # Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
-            # Count the number of breves in the second part of the sequence of middle_notes
-            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus)
-            part2_count_B = minim_counter2 / float(tempus*prolatio)
+            // Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
+            // Count the number of breves in the second part of the sequence of middle_notes
+            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
+            part2_count_B = minim_counter2 / (tempus*prolatio);
 
-            # If there is just one breve before the first dot
-            if part1_count_B == 1:
-                # Two possibilities: dot of division / dot of augmentation
-                # We have to take a look at the second part of the middle notes (part2_middle_notes) to figure this out
+            // If there is just one breve before the first dot
+            if (part1_count_B == 1) {
+                // Two possibilities: dot of division / dot of augmentation
+                // We have to take a look at the second part of the middle notes (part2_middle_notes) to figure this out
 
-                # If the number of breves after the dot is an integer number
-                if part2_count_B == int(part2_count_B):
-                    # DOT OF DIVISION
-                    no_division_dot_flag = False
-                    #print('Imperfection app\n')
-                    dot_element.addAttribute('form', 'div')
-                    minim_counter = minim_counter1 + minim_counter2
-                    # Total of breves in the middle_notes
-                    modification(part1_count_B, start_note, part1_middle_notes, None, None, 'brevis', 'longa')
-                    modification(part2_count_B, None, part2_middle_notes, end_note, following_note, 'brevis', 'longa')
-                else:
-                    # DOT OF AUGMENTATION
-                    #print('Augmentation_typeI\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
+                // If the number of breves after the dot is an integer number
+                if (part2_count_B == Math.floor(part2_count_B)) {
+                    // DOT OF DIVISION
+                    no_division_dot_flag = false;
+                    // console.log('Imperfection app\n');
+                    dot_element.setAttribute('form', 'div');
+                    minim_counter = minim_counter1 + minim_counter2;
+                    // Total of breves in the middle_notes
+                    modification(part1_count_B, start_note, part1_middle_notes, None, None, 'brevis', 'longa');
+                    modification(part2_count_B, None, part2_middle_notes, end_note, following_note, 'brevis', 'longa');
+                } else {
+                    // DOT OF AUGMENTATION
+                    // console.log('Augmentation_typeI\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
 
-            # If there is more than one breve before the first dot, it is impossible for that dot to be a 'dot of division'
-            else:
-                # DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
-                if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'perf':
-                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus)
-                    pass
-                else:                
-                    #print('Augmentation_def\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
+            // If there is more than one breve before the first dot, it is impossible for that dot to be a 'dot of division'
+            else {
+                // DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
+                if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'perf') {
+                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
+                } else {
+                    // console.log('Augmentation_def\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
 
-            # Total of breves in the middle_notes
-            count_B = minim_counter / (tempus * prolatio)
+            // Total of breves in the middle_notes
+            count_B = minim_counter / (tempus * prolatio);
+        }
         
-    if no_division_dot_flag:
-        # Checking that the sequence of notes is fine, and then calling the modification function
-        if(minim_counter % (tempus * prolatio) == 0):
-            #print("GOOD")
-            pass
-        else:
-            print("BAD! THE DIVISION IS NOT AN INTEGER NUMBER - not an integer number of Breves!")
-            print([start_note] + middle_notes + [end_note])
-            print("Breves: " + str(minim_counter / float(tempus * prolatio)))
-        # Given the total amount of breves in-between the "longas", see if they can be arranged in groups of 3
-        # According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-        modification(count_B, start_note, middle_notes, end_note, following_note, 'brevis', 'longa')
+    if (no_division_dot_flag) {
+        // Checking that the sequence of notes is fine, and then calling the modification function
+        if (minim_counter % (tempus * prolatio) == 0){
+            // console.log("GOOD");
+        } else {
+            console.log("BAD! THE DIVISION IS NOT AN INTEGER NUMBER - not an integer number of Breves!");
+            console.log(([start_note].concat(middle_notes)).concat(end_note));
+            console.log("Breves: " + (minim_counter / (tempus * prolatio)));
+        }
+        // Given the total amount of breves in-between the "longas", see if they can be arranged in groups of 3
+        // According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
+        modification(count_B, start_note, middle_notes, end_note, following_note, 'brevis', 'longa');
+    }
+}
 
 def find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, colored_figures):
     # Determine the note-level at which coloration is working (i.e., the perfect note it is meant to imperfect)
