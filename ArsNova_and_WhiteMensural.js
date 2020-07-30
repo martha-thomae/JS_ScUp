@@ -416,117 +416,126 @@ function minims_between_semibreves(start_note, middle_notes, end_note, following
     }
 }
 
-def sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain):
-    no_division_dot_flag = True    # Default value
-    sequence = [start_note] + middle_notes
-    first_dotted_note_index = find_first_dotted_note(sequence)
+function sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
+    var no_division_dot_flag = true;    // Default value
+    var sequence = [start_note].concat(middle_notes);
+    var first_dotted_note_index = find_first_dotted_note(sequence);
+    var dur, minim_counter, count_Sb, dot_element, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, part1_count_Sb, part2_count_Sb;
+    var first_dotted_note, first_dotted_note_default_gain;
 
-    # I have already taken into account that the minim could be dotted (and smaller values?),
-    # the new note that could be dotted is the semibrevis. SO:
+    // I have already taken into account that the minim could be dotted (and smaller values?),
+    // the new note that could be dotted is the semibrevis. SO:
 
-    # If first_dotted_note_index == -1, then there is no dot in the sequence at all
-    if first_dotted_note_index == -1:
-        # Getting the total of semibreves in the middle_notes
-        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain)
-        count_Sb = minim_counter / (prolatio)
-        #print('No-dot\n')
+    // If first_dotted_note_index == -1, then there is no dot in the sequence at all
+    if (first_dotted_note_index == -1) {
+        // Getting the total of semibreves in the middle_notes
+        minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+        count_Sb = minim_counter / (prolatio);
+        // console.log('No-dot\n');
+    }
 
-    # If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
-    elif first_dotted_note_index == 0:
-        # DOT OF PERFECTION
-        dot_element = get_next_element(start_note)
-        dot_element.addAttribute('form', 'perf')
-        #print('Perfection\n')
-        # Getting the total of semibreves in the middle_notes
-        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio)
-        count_Sb = minim_counter / (prolatio)
+    // If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
+    else if (first_dotted_note_index == 0) {
+        // DOT OF PERFECTION
+        dot_element = get_next_element(start_note);
+        dot_element.setAttribute('form', 'perf');
+        // console.log('Perfection\n');
+        // Getting the total of semibreves in the middle_notes
+        minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
+        count_Sb = minim_counter / (prolatio);
+    }
 
-    # Otherwise, if the dot is in any middle note:
-    else:
-        first_dotted_note = sequence[first_dotted_note_index]######################################
-        dot_element = get_next_element(first_dotted_note)
-        if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'aug':
-            #If the first dot is an already known dot of augmentation
-            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio)
-            count_Sb = minim_counter / (prolatio)
-        else:
-            # We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
-            # Then count the number of semibreves in each of the two parts to discover if this 'dot' is a 
-            # 'dot of division' or a 'dot of addition'
-            part1_middle_notes = sequence[1 : first_dotted_note_index + 1]
-            part2_middle_notes = sequence[first_dotted_note_index + 1 : len(sequence)]
+    // Otherwise, if the dot is in any middle note:
+    else {
+        first_dotted_note = sequence[first_dotted_note_index];////////////////////////////////////////
+        dot_element = get_next_element(first_dotted_note);
+        if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug') {
+            // If the first dot is an already known dot of augmentation
+            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
+            count_Sb = minim_counter / (prolatio);
+        } else {
+            // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
+            // Then count the number of semibreves in each of the two parts to discover if this 'dot' is a
+            // 'dot of division' or a 'dot of addition'
+            part1_middle_notes = sequence.slice(1, first_dotted_note_index + 1);
+            part2_middle_notes = sequence.slice(first_dotted_note_index + 1, len(sequence));
 
-            # Semibreves BEFORE the first dot
-            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain)
-            part1_count_Sb = minim_counter1 / float(prolatio)
+            // Semibreves BEFORE the first dot
+            minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain);
+            part1_count_Sb = minim_counter1 / prolatio;
 
-            # The individual value of the first dotted note (the last note in the sequence preceding the dot)
-            dur = first_dotted_note.getAttribute('dur').value
-            first_dotted_note_default_gain = undotted_note_gain[note_durs.index(dur)]
-            #print("Notes in the Sequence preceeding this dot " + str(part1_middle_notes))
-            #print("FIRST DOTTED NOTE: " + str(first_dotted_note) + ", with duration of: " + dur + ", which gain is: " + str(first_dotted_note_default_gain))
+            // The individual value of the first dotted note (the last note in the sequence preceding the dot)
+            dur = first_dotted_note.getAttribute('dur');
+            first_dotted_note_default_gain = undotted_note_gain[note_durs.indexOf(dur)];
+            // console.log("Notes in the Sequence preceeding this dot " + part1_middle_notes);
+            // console.log("FIRST DOTTED NOTE: " + str(first_dotted_note) + ", with duration of: " + dur + ", which gain is: " + str(first_dotted_note_default_gain));
 
-            # Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
-            # Count the number of semibreves in the second part of the sequence of middle_notes
-            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio)
-            part2_count_Sb = minim_counter2 / float(prolatio)
+            // Taking the second part of the sequence of the middle notes (part2_middle_notes) into account
+            // Count the number of semibreves in the second part of the sequence of middle_notes
+            minim_counter2 = counting_minims(part2_middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
+            part2_count_Sb = minim_counter2 / prolatio;
 
 
-            # If there is just one semibreve before the first dot
-            if part1_count_Sb == 1:
-                # Two possibilities: dot of division / dot of augmentation
-                # We have to use the results of the second part of the middle notes (part2_middle_notes) to figure this out
+            // If there is just one semibreve before the first dot
+            if (part1_count_Sb == 1) {
+                // Two possibilities: dot of division / dot of augmentation
+                // We have to use the results of the second part of the middle notes (part2_middle_notes) to figure this out
 
-                # If the number of semibreves after the dot is an integer number
-                if part2_count_Sb == int(part2_count_Sb):
-                    # DOT OF DIVISION
-                    no_division_dot_flag = False
-                    #print('Imperfection app\n')
-                    dot_element.addAttribute('form', 'div')
-                    minim_counter = minim_counter1 + minim_counter2
-                    # Total of semibreves in the middle_notes
-                    modification(part1_count_Sb, start_note, part1_middle_notes, None, None, 'semibrevis', 'brevis')
-                    modification(part2_count_Sb, None, part2_middle_notes, end_note, following_note, 'semibrevis', 'brevis')
-                else:
-                    # DOT OF AUGMENTATION
-                    #print('Augmentation_typeI\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
-                    pass
+                // If the number of semibreves after the dot is an integer number
+                if (part2_count_Sb == Math.floor(part2_count_Sb)) {
+                    // DOT OF DIVISION
+                    no_division_dot_flag = false;
+                    // console.log('Imperfection app\n');
+                    dot_element.setAttribute('form', 'div');
+                    minim_counter = minim_counter1 + minim_counter2;
+                    // Total of semibreves in the middle_notes
+                    modification(part1_count_Sb, start_note, part1_middle_notes, None, None, 'semibrevis', 'brevis');
+                    modification(part2_count_Sb, None, part2_middle_notes, end_note, following_note, 'semibrevis', 'brevis');
+                } else {
+                    // DOT OF AUGMENTATION
+                    // console.log('Augmentation_typeI\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
 
-            # If there is more than one semibreve before the first dot, it is impossible for that dot to be a 'dot of division'
-            else:
-                # DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
-                if dot_element.hasAttribute('form') and dot_element.getAttribute('form').value == 'perf':
-                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio)
-                    pass
-                else:
-                    #print('Augmentation_def\n')
-                    dot_element.addAttribute('form', 'aug')
-                    first_dotted_note.addAttribute('quality', 'p')
-                    first_dotted_note.addAttribute('num', '2')
-                    first_dotted_note.addAttribute('numbase', '3')
-                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2
-                    pass
+            // If there is more than one semibreve before the first dot, it is impossible for that dot to be a 'dot of division'
+            else {
+                // DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
+                if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'perf') {
+                    minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
+                }
+                else {
+                    // console.log('Augmentation_def\n');
+                    dot_element.setAttribute('form', 'aug');
+                    first_dotted_note.setAttribute('dur.quality', 'perfecta');
+                    first_dotted_note.setAttribute('num', '2');
+                    first_dotted_note.setAttribute('numbase', '3');
+                    minim_counter = minim_counter1 + (0.5 * first_dotted_note_default_gain) + minim_counter2;
+                }
+            }
 
-            # Total of semibreves in the middle_notes
-            count_Sb = minim_counter / prolatio
+            // Total of semibreves in the middle_notes
+            count_Sb = minim_counter / prolatio;
+        }
+    }
 
-    if no_division_dot_flag:
-        # Checking that the sequence of notes is fine, and then calling the modification function
-        if(minim_counter % prolatio == 0):
-            #print("GOOD")
-            pass
-        else:
-            print("BAD! THE DIVISION IS NOT AN INTEGER NUMBER - not an integer number of Semibreves!")
-            print([start_note] + middle_notes + [end_note])
-            print("Semibreves: " + str(minim_counter / float(prolatio)))
-        # Given the total amount of semibreves in-between the "breves", see if they can be arranged in groups of 3
-        # According to how many semibreves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-        modification(count_Sb, start_note, middle_notes, end_note, following_note, 'semibrevis', 'brevis')
+    if (no_division_dot_flag) {
+        // Checking that the sequence of notes is fine, and then calling the modification function
+        if (minim_counter % prolatio == 0) {
+            // console.log("GOOD");
+        } else {
+            console.log("BAD! THE DIVISION IS NOT AN INTEGER NUMBER - not an integer number of Semibreves!");
+            console.log(([start_note].concat(middle_notes)).concat(end_note));
+            console.log("Semibreves: " + (minim_counter / prolatio));
+        // Given the total amount of semibreves in-between the "breves", see if they can be arranged in groups of 3
+        // According to how many semibreves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
+        modification(count_Sb, start_note, middle_notes, end_note, following_note, 'semibrevis', 'brevis');
+    }
+}
 
 def breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain):
     no_division_dot_flag = True    # Default value
