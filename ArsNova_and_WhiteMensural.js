@@ -63,7 +63,7 @@ function counting_minims_in_an_undotted_sequence(sequence_of_notes, note_durs, u
     return minim_counter;
 }
 
-function counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio = None, tempus = None, modusminor = None, modusmaior = None) {
+function counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio = null, tempus = null, modusminor = null, modusmaior = null) {
     var minim_counter, note, dur, index, gain, ratio;
     minim_counter = 0;
     console.log('@dur\t\tCounter (m)\tAccumulator (m)');
