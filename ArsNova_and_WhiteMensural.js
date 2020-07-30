@@ -1098,47 +1098,58 @@ function lining_up(quasiscore_mensural_doc) {
         }
 
 
-        # There are notes that, when dotted, the dot used must be a dot of augmentation
-        # Only imperfect notes can be augmented by a dot, but not all dots in them are augmentation dots
-        # These imperfect notes can be followed by a division dot, as they can form a perfection with a larger note.
-        # If a note is perfect, by the functions above all the dotted notes with smaller values are examined to determine if the dot is a 'division dot' or an 'augmentation dot'
-        # But in case of larger values, this is not evaluated.
-        # The following code performs that action. It goes from 'maxima' to 'semibrevis', until if finds a perfect mensuration. 
-        # All the notes larger than that perfect note are considered to be augmented by any dot following them.
+        // There are notes that, when dotted, the dot used must be a dot of augmentation
+        // Only imperfect notes can be augmented by a dot, but not all dots in them are augmentation dots
+        // These imperfect notes can be followed by a division dot, as they can form a perfection with a larger note.
+        // If a note is perfect, by the functions above all the dotted notes with smaller values are examined to determine if the dot is a 'division dot' or an 'augmentation dot'
+        // But in case of larger values, this is not evaluated.
+        // The following code performs that action. It goes from 'maxima' to 'semibrevis', until if finds a perfect mensuration.
+        // All the notes larger than that perfect note are considered to be augmented by any dot following them.
 
-        note_level = ['maxima', 'longa', 'brevis', 'semibrevis']
-        mensuration = [modusmaior, modusminor, tempus, prolatio]
-        notes_NoDivisionDot_possibility = []
-        i = 0
-        acum_boolean =  mensuration[0]
-        while (acum_boolean % 2 == 0):
-            notes_NoDivisionDot_possibility.append(note_level[i])
-            i += 1
-            try:
-                acum_boolean += mensuration[i]
-            except:
-                break
-        #print(acum_boolean)
-        #print(notes_NoDivisionDot_possibility)
+        var note_level = ['maxima', 'longa', 'brevis', 'semibrevis'];
+        var mensuration = [modusmaior, modusminor, tempus, prolatio];
+        var notes_NoDivisionDot_possibility = [];
+        var k = 0;
+        var acum_boolean =  mensuration[0];
+        while (acum_boolean % 2 == 0) {
+            notes_NoDivisionDot_possibility.push(note_level[k]);
+            k += 1;
+            try {
+                acum_boolean += mensuration[k];
+            } catch(err) {
+                break;
+            }
+        }
+        //console(acum_boolean);
+        //console(notes_NoDivisionDot_possibility);
 
-        if len(notes_NoDivisionDot_possibility) != 0:
-            dots = staff.getDescendantsByName('dot')
-            if len(notes_NoDivisionDot_possibility) == 4:
-                for dot in dots:
-                    dot.addAttribute('form', 'aug')
-                    dotted_note = get_preceding_noterest(dot)
-                    dotted_note.addAttribute('quality', 'p')
-                    dotted_note.addAttribute('num', '2')
-                    dotted_note.addAttribute('numbase', '3')
-            else:
-                for dot in dots:
-                    dotted_note = get_preceding_noterest(dot)
-                    # The preceding element of a dot should be either a <note> or a <rest>, so the following variable (dur_dotted_note) should be well defined
-                    dur_dotted_note = dotted_note.getAttribute('dur').value
-                    if dur_dotted_note in notes_NoDivisionDot_possibility:
-                        # Augmentation dot
-                        dot.addAttribute('form', 'aug')
-                        dotted_note.addAttribute('quality', 'p')
-                        dotted_note.addAttribute('num', '2')
-                        dotted_note.addAttribute('numbase', '3')
-    return quasiscore_mensural_doc
+        var dots, dot, dotted_note, dur_dotted_note;
+        if (notes_NoDivisionDot_possibility.length != 0) {
+            dots = staff.getElementsByTagName('dot');
+            if (notes_NoDivisionDot_possibility.length == 4) {
+                for (dot of dots) {
+                    dot.setAttribute('form', 'aug');
+                    dotted_note = get_preceding_noterest(dot);
+                    dotted_note.setAttribute('dur.quality', 'perfecta');
+                    dotted_note.setAttribute('num', '2');
+                    dotted_note.setAttribute('numbase', '3');
+                }
+            } else {
+                for (dot of dots) {
+                    dotted_note = get_preceding_noterest(dot);
+                    // The preceding element of a dot should be either a <note> or a <rest>, so the following variable (dur_dotted_note) should be well defined
+                    dur_dotted_note = dotted_note.getAttribute('dur');
+                    if (notes_NoDivisionDot_possibility.includes(dur_dotted_note)) {
+                        // Augmentation dot
+                        dot.setAttribute('form', 'aug');
+                        dotted_note.setAttribute('dur.quality', 'perfecta');
+                        dotted_note.setAttribute('num', '2');
+                        dotted_note.setAttribute('numbase', '3');
+                    }
+                }
+            }
+        }
+    }
+
+    return quasiscore_mensural_doc;
+}
