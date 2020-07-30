@@ -98,7 +98,7 @@ function counting_minims(sequence_of_notes, note_durs, undotted_note_gain, dotte
         } else {
             gain = undotted_note_gain[index];
             if (note.hasAttribute('num') && note.hasAttribute('numbase')) {
-                ratio = new Fraction([note.getAttribute('numbase'), note.getAttribute('num').value]);
+                ratio = new Fraction([note.getAttribute('numbase'), note.getAttribute('num')]);
                 gain = ratio.mul(gain);
             }
         }
@@ -331,7 +331,7 @@ function minims_between_semibreves(start_note, middle_notes, end_note, following
 
     //Otherwise, if the dot is in any middle note:
     else {
-        first_dotted_note = sequence[first_dotted_note_index]; ////////////////////////////////////////
+        first_dotted_note = sequence[first_dotted_note_index];////////////////////////////////////////
         dot_element = get_next_element(first_dotted_note);
         if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug') {
             // If the first dot is an already known dot of augmentation
@@ -348,7 +348,7 @@ function minims_between_semibreves(start_note, middle_notes, end_note, following
 
             // The individual value of the first dotted note (the last note in the sequence preceding the dot)
             dur = first_dotted_note.getAttribute('dur');
-            first_dotted_note_default_gain = undotted_note_gain[note_durs.index(dur)];
+            first_dotted_note_default_gain = undotted_note_gain[note_durs.indexOf(dur)];
             // console.log("Notes in the Sequence preceeding this dot " + part1_middle_notes);
             // console.log("FIRST DOTTED NOTE: " + first_dotted_note + ", with duration of: " + dur + ", which gain is: " + first_dotted_note_default_gain);
 
@@ -458,7 +458,7 @@ function sb_between_breves(start_note, middle_notes, end_note, following_note, p
             // Then count the number of semibreves in each of the two parts to discover if this 'dot' is a
             // 'dot of division' or a 'dot of addition'
             part1_middle_notes = sequence.slice(1, first_dotted_note_index + 1);
-            part2_middle_notes = sequence.slice(first_dotted_note_index + 1, len(sequence));
+            part2_middle_notes = sequence.slice(first_dotted_note_index + 1, sequence.length);
 
             // Semibreves BEFORE the first dot
             minim_counter1 = counting_minims_in_an_undotted_sequence(part1_middle_notes, note_durs, undotted_note_gain);
