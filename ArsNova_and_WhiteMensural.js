@@ -306,7 +306,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
     }
 }
 
-function minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain) {
+function minims_between_semibreves_processing(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain) {
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
@@ -416,7 +416,7 @@ function minims_between_semibreves(start_note, middle_notes, end_note, following
     }
 }
 
-function sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
+function sb_between_breves_processing(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
@@ -538,7 +538,7 @@ function sb_between_breves(start_note, middle_notes, end_note, following_note, p
     }
 }
 
-function breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
+function breves_between_longas_processing(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
     no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
@@ -769,6 +769,24 @@ function coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, te
     }
 }
 
+function minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain) {
+    if (prolatio == 3) {
+        minims_between_semibreves_processing(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
+    }
+}
+
+function sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
+    if (tempus == 3) {
+        sb_between_breves_processing(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
+    }
+}
+
+function breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
+    if (modusminor == 3) {
+        breves_between_longas_processing(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
+    }
+}
+
 // Main function
 const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
@@ -866,237 +884,212 @@ const lining_up = quasiscore_mensural_doc => {
 
         var o, f, start_note, end_note, middle_notes, following_note;
 
-        // PROCESSING OF MINIMS AND SEMIBREVES (DEPENDING ON THE VALUE OF @PROLATIO)
+        // PROCESSING OF MINIMS AND SEMIBREVES (REGARDLESS OF THE @PROLATIO)
         // SEQUENCES OF MINIMS DELIMITED BY SEMIBREVES (OR HIGHER NOTE VALUES)
 
         //console("\nSEMIBREVE GEQ");
         //console(list_of_indices_geq_Sb + "\n");
-
-        if (prolatio == 3) {
-
-            if (!(list_of_indices_geq_Sb.includes(0)) && list_of_indices_geq_Sb.length != 0) {
-                start_note = null;
-                f = list_of_indices_geq_Sb[0];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
-                }
-                middle_notes = voice_noterest_content.slice(0, f);
-                /*
-                //DEBUG:
-                var s = null;
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-                */
-                minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
+        if (!(list_of_indices_geq_Sb.includes(0)) && list_of_indices_geq_Sb.length != 0) {
+            start_note = null;
+            f = list_of_indices_geq_Sb[0];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
+                following_note = null;
             }
-
-            for (var j = 0; j < list_of_indices_geq_Sb.length-1; j++) {
-                // Define the sequence of notes
-                o = list_of_indices_geq_Sb[j];
-                start_note = voice_noterest_content[o];
-                f = list_of_indices_geq_Sb[j+1];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
+            middle_notes = voice_noterest_content.slice(0, f);
+            /*
+            //DEBUG:
+            var s = null;
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
                 }
-                middle_notes = voice_noterest_content.slice(o+1, f);
-                /*
-                //DEBUG:
-                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);*/
-                minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
-            }
-
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+            */
+            minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
-        else {
-            // prolatio = 2
+        for (var j = 0; j < list_of_indices_geq_Sb.length-1; j++) {
+            // Define the sequence of notes
+            o = list_of_indices_geq_Sb[j];
+            start_note = voice_noterest_content[o];
+            f = list_of_indices_geq_Sb[j+1];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
+                following_note = null;
+            }
+            middle_notes = voice_noterest_content.slice(o+1, f);
+            /*
+            //DEBUG:
+            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
+                }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);*/
+            minims_between_semibreves(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
 
-        // PROCESSING OF SEMIBREVES AND BREVES (DEPENDING ON THE VALUE OF @TEMPUS)
+        // PROCESSING OF SEMIBREVES AND BREVES (REGARDLESS OF THE @TEMPUS)
         // SEQUENCES OF SEMIBREVES DELIMITED BY BREVES (OR HIGHER NOTE VALUES)
 
         //console("\nBREVE GEQ");
         //console(list_of_indices_geq_B + "\n");
-
-        if (tempus == 3) {
-
-            if (!(list_of_indices_geq_B.includes(0)) && list_of_indices_geq_B.length != 0) {
-                start_note = null;
-                f = list_of_indices_geq_B[0];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
-                }
-                middle_notes = voice_noterest_content.slice(0, f);
-                /*
-                //DEBUG:
-                var s = null;
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-                */
-                sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
+        if (!(list_of_indices_geq_B.includes(0)) && list_of_indices_geq_B.length != 0) {
+            start_note = null;
+            f = list_of_indices_geq_B[0];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
+                following_note = null;
             }
-
-            for (var j = 0; j < list_of_indices_geq_B.length-1; j++) {
-                // Define the sequence of notes
-                o = list_of_indices_geq_B[j];
-                start_note = voice_noterest_content[o];
-                f = list_of_indices_geq_B[j+1];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
+            middle_notes = voice_noterest_content.slice(0, f);
+            /*
+            //DEBUG:
+            var s = null;
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
                 }
-                middle_notes = voice_noterest_content.slice(o+1, f);
-                /*
-                //DEBUG:
-                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);*/
-                sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
-            }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+            */
+            sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
-        else {
-            // tempus = 2
+        for (var j = 0; j < list_of_indices_geq_B.length-1; j++) {
+            // Define the sequence of notes
+            o = list_of_indices_geq_B[j];
+            start_note = voice_noterest_content[o];
+            f = list_of_indices_geq_B[j+1];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
+                following_note = null;
+            }
+            middle_notes = voice_noterest_content.slice(o+1, f);
+            /*
+            //DEBUG:
+            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
+                }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);*/
+            sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
 
-        // PROCESSING OF BREVES AND LONGAS (DEPENDING ON THE VALUE OF @MODUSMINOR)
+        // PROCESSING OF BREVES AND LONGAS (REGARDLESS OF THE @MODUSMINOR)
         // SEQUENCES OF BREVES DELIMITED BY LONGAS (OR HIGHER NOTE VALUES)
 
         //console("\nLONGA GEQ");
         //console(list_of_indices_geq_L + "\n");
-
-        if (modusminor == 3) {
-
-            if (!(list_of_indices_geq_L.includes(0)) && list_of_indices_geq_L.length != 0) {
-                start_note = null;
-                f = list_of_indices_geq_L[0];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
-                }
-                middle_notes = voice_noterest_content.slice(0, f);
-
-                //DEBUG:
-                var s = null;
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-
-                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
-            }
-
-            for (var j = 0; j < llist_of_indices_geq_L.length-1; j++) {
-                // Define the sequence of notes
-                o = list_of_indices_geq_L[j];
-                start_note = voice_noterest_content[o];
-                f = list_of_indices_geq_L[j+1];
-                end_note = voice_noterest_content[f];
-                try {
-                    following_note = voice_noterest_content[f+1];
-                } catch(err) {
-                    following_note = null;
-                }
-                middle_notes = voice_noterest_content.slice(o+1, f);
-
-                //DEBUG:
-                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
-                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-
-                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
-            }
-
-            // If the last note on the voice_noterest_content isn't a longa (or maxima):
-            var index_last_noterest = voice_noterest_content.length - 1;
-            if (!(list_of_indices_geq_L.includes(index_last_noterest))) {
-                o = list_of_indices_geq_L[list_of_indices_geq_L.length - 1];
-                start_note = voice_noterest_content[o];
-                end_note = null;
+        if (!(list_of_indices_geq_L.includes(0)) && list_of_indices_geq_L.length != 0) {
+            start_note = null;
+            f = list_of_indices_geq_L[0];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
                 following_note = null;
-                middle_notes = voice_noterest_content.slice(o+1,index_last_noterest+1);
-
-                //DEBUG:
-                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
-                var e = null;
-                var m = "";
-                for (var midnote of middle_notes){
-                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                    if (attribs == '0 null'){
-                        m += midnote.tagName + ", ";
-                    } else {
-                        m += attribs + ", ";
-                    }
-                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-
-                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
             }
+            middle_notes = voice_noterest_content.slice(0, f);
+
+            //DEBUG:
+            var s = null;
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
+                }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+
+            breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
-        else {
-            // modusminor = 2
+        for (var j = 0; j < llist_of_indices_geq_L.length-1; j++) {
+            // Define the sequence of notes
+            o = list_of_indices_geq_L[j];
+            start_note = voice_noterest_content[o];
+            f = list_of_indices_geq_L[j+1];
+            end_note = voice_noterest_content[f];
+            try {
+                following_note = voice_noterest_content[f+1];
+            } catch(err) {
+                following_note = null;
+            }
+            middle_notes = voice_noterest_content.slice(o+1, f);
+
+            //DEBUG:
+            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
+                }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+
+            breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
+        }
+
+        // If the last note on the voice_noterest_content isn't a longa (or maxima):
+        var index_last_noterest = voice_noterest_content.length - 1;
+        if (!(list_of_indices_geq_L.includes(index_last_noterest))) {
+            o = list_of_indices_geq_L[list_of_indices_geq_L.length - 1];
+            start_note = voice_noterest_content[o];
+            end_note = null;
+            following_note = null;
+            middle_notes = voice_noterest_content.slice(o+1,index_last_noterest+1);
+
+            //DEBUG:
+            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+            var e = null;
+            var m = "";
+            for (var midnote of middle_notes){
+                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                if (attribs == '0 null'){
+                    m += midnote.tagName + ", ";
+                } else {
+                    m += attribs + ", ";
+                }
+            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+
+            breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
         }
 
 
