@@ -531,6 +531,7 @@ function sb_between_breves(start_note, middle_notes, end_note, following_note, p
             console.log("BAD! THE DIVISION IS NOT AN INTEGER NUMBER - not an integer number of Semibreves!");
             console.log(([start_note].concat(middle_notes)).concat(end_note));
             console.log("Semibreves: " + (minim_counter / prolatio));
+        }
         // Given the total amount of semibreves in-between the "breves", see if they can be arranged in groups of 3
         // According to how many semibreves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
         modification(count_Sb, start_note, middle_notes, end_note, following_note, 'semibrevis', 'brevis');
@@ -636,6 +637,7 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
             // Total of breves in the middle_notes
             count_B = minim_counter / (tempus * prolatio);
         }
+    }
         
     if (no_division_dot_flag) {
         // Checking that the sequence of notes is fine, and then calling the modification function
