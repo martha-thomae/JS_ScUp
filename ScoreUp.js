@@ -1,7 +1,7 @@
 const MergeModule = require('./Merge.js');
 const ArsAntiqua = require('./ArsAntiqua.js');
+const ArsNova_and_WhiteMensural = require('./ArsNova_and_WhiteMensural.js');
 const PostProcess = require('./postprocessing.js');
-//const ArsNova_and_WhiteMensural = require('./ArsNova_and_WhiteMensural.js');
 
 require('global-jsdom')()
 const DOMParser = window.DOMParser;

@@ -528,6 +528,8 @@ const lining_up = quasiscore_mensural_doc => {
 
         //console.log("\nLONGA GEQ");
         //console.log(list_of_indices_geq_L + "\n");
+
+        // Empty list (no 'longas' or 'maximas' at all in the voice)
         if(list_of_indices_geq_L.length == 0) {
             // Define the sequence of notes
             start_note = null;
@@ -546,9 +548,12 @@ const lining_up = quasiscore_mensural_doc => {
                     m += attribs + ", ";
                 }
             } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+            
             breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+        }
 
-        } else {
+        // At least one long or maxima:
+        else {
 
             if (!(list_of_indices_geq_L.includes(0))) {
                 start_note = null;
