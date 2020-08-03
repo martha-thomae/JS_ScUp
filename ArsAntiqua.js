@@ -17,12 +17,12 @@
 */
 const Fraction = require('fraction.js');
 
-// Functions about preceeding and suceeding elements
+// Functions about preceding and suceeding elements
 function get_preceding_noterest(target_element) {
     var preceding_element = target_element.previousSibling;
-    while (preceeding_element.tagName != 'note' && preceeding_element.tagName != 'rest'){
-        preceding_element = preceeding_element.previousSibling;
-    } return preceeding_element;
+    while (preceding_element.tagName != 'note' && preceding_element.tagName != 'rest'){
+        preceding_element = preceding_element.previousSibling;
+    } return preceding_element;
 }
 
 // Functions related to the counting of minims in a sequence of notes
@@ -97,7 +97,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             // One of he possibilities when 2 breves are left out, is alteration.
             // One must alter the last (uncolored) note from the middle_notes of the sequence
             last_middle_note = middle_notes[middle_notes.length - 1];
-            // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
+            // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
             last_uncolored_note = last_middle_note;
             // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
             while (last_uncolored_note.hasAttribute('colored')){
@@ -161,7 +161,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                         else {
                         // Default + Warning Case
                             console.log("Default Case:\tImperfection a.p.p. & Imperfection a.p.a.\n");
-                            // If the "alternative interpretation" is forbidden, and imperfection imp. a.p.a. was discarded just because it entered in conflict with rule # 1
+                            // If the "alternative interpretation" is forbidden, and imperfection a.p.a. was discarded just because it entered in conflict with rule # 1
                             // (this is, impapa_against_rule1 flag is True), then we force imperfection a.p.a. as it is the only viable option. But we also raise a 'warning'
                             // Imperfection a.p.p.
                             start_note.setAttribute('dur.quality', 'imperfecta');
@@ -219,16 +219,15 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             else {
                 // One of the possibilities when 6,9,12,etc. breves are left out, involves alteration
                 // One must alter the last (uncolored) note from the middle_notes of the sequence
-                // The last middle note is given by:
                 last_middle_note = middle_notes[middle_notes.length - 1];
-                // If this note is uncolored, it is a candidate for alteration (given that it is a note and not a rest and that it is a breve and not a smaller value)
+                // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
                 last_uncolored_note = last_middle_note;
                 // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
                 while (last_uncolored_note.hasAttribute('colored')) {
                     last_uncolored_note = get_preceding_noterest(last_uncolored_note);
                 }
 
-                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !((has_been_modified(start_note)))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))){
+                if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note))) && (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note)))){
                 // Default Case:
                     console.log("Default Case:\tImperfection a.p.p. & Alteration\n");
                     // Imperfection a.p.p.
@@ -344,38 +343,6 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     if (modusminor == 3){
         modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa');
     } // Else (@modusminor = 2), no modification on the long-breve level is needed
-}
-
-function replace_ligatures_by_brackets(meiDoc){
-    // Replace all ligatures by <bracketSpan> elements located at the end of the <section>
-    const section = meiDoc.getElementsByTagName('section')[0];
-    // First, retrieve all ligatures
-    const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
-    // Then, for each ligature
-    for (var ligature of ligatures) {
-        // 1. Take the notes contained within that <ligature>
-        // and incorporate them into the stream of notes of the <layer>
-        var parent = ligature.parentElement;
-        var ligated_notes = Array.from(ligature.children);
-        for (var note of ligated_notes) {
-            parent.insertBefore(note, ligature);
-        }
-        // 2. And create the <bracketSpan> element to replace the ligature
-        var bracketSpan = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'bracketSpan');
-        bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
-        // With @startid and @endid pointing to the start and end of the ligature
-        var start_note = ligated_notes[0];
-        var end_note = ligated_notes[ligated_notes.length - 1];
-        bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
-        bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
-        // And with attributes corresponding to a mensural ligature
-        bracketSpan.setAttribute('func', 'ligature');
-        bracketSpan.setAttribute('lform', 'solid');
-        // 3. Remove the ligature
-        parent.removeChild(ligature);
-        // 4. Add the <bracketSpan> to the end of <section>
-        section.appendChild(bracketSpan);
-    }
 }
 
 function replace_maximas_by_duplexlongas(meiDoc){
@@ -529,68 +496,16 @@ const lining_up = quasiscore_mensural_doc => {
 
         //console.log("\nLONGA GEQ");
         //console.log(list_of_indices_geq_L + "\n");
-        if (!(list_of_indices_geq_L.includes(0)) && list_of_indices_geq_L.lenght != 0) {
+
+        // Empty list (no 'longas' or 'maximas' at all in the voice)
+        if(list_of_indices_geq_L.length == 0) {
+            // Define the sequence of notes
             start_note = null;
-            f = list_of_indices_geq_L[0];
-            end_note = voice_noterest_dots_content[f];
-            try {
-                following_note = voice_noterest_dots_content[f+1];
-            } catch(err) {
-                following_note = null;
-            }
-            middle_notes = voice_noterest_dots_content.slice(0,f);
+            end_note = null;
+            middle_notes = voice_noterest_dots_content.slice(0, voice_noterest_dots_content.length);
+
             //DEBUG:
             var s = null;
-            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-            var m = "";
-            for (var midnote of middle_notes){
-                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                if (attribs == '0 null'){
-                    m += midnote.tagName + ", ";
-                } else {
-                    m += attribs + ", ";
-                }
-            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-            breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
-        }
-
-        for (var j = 0; j < list_of_indices_geq_L.length-1; j++) {
-            // Define the sequence of notes
-            o = list_of_indices_geq_L[j];
-            start_note = voice_noterest_dots_content[o];
-            f = list_of_indices_geq_L[j+1];
-            end_note = voice_noterest_dots_content[f];
-            try {
-                following_note = voice_noterest_dots_content[f+1];
-            } catch(err) {
-                following_note = null;
-            }
-            middle_notes = voice_noterest_dots_content.slice(o+1,f);
-            //DEBUG:
-            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
-            var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
-            var m = "";
-            for (var midnote of middle_notes){
-                var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
-                if (attribs == '0 null'){
-                    m += midnote.tagName + ", ";
-                } else {
-                    m += attribs + ", ";
-                }
-            } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-            breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
-        }
-
-        // If the last note on the voice_noterest_dots_content isn't a longa (or maxima):
-        var index_last_noterest = voice_noterest_dots_content.length - 1;
-        if (!(list_of_indices_geq_L.includes(index_last_noterest))) {
-            o = list_of_indices_geq_L[list_of_indices_geq_L.length - 1];
-            start_note = voice_noterest_dots_content[o];
-            end_note = null;
-            following_note = null;
-            middle_notes = voice_noterest_dots_content.slice(o+1,index_last_noterest+1);
-            //DEBUG:
-            var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
             var e = null;
             var m = "";
             for (var midnote of middle_notes){
@@ -601,12 +516,91 @@ const lining_up = quasiscore_mensural_doc => {
                     m += attribs + ", ";
                 }
             } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+            
             breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+        }
+
+        // At least one long or maxima:
+        else {
+
+            if (!(list_of_indices_geq_L.includes(0))) {
+                start_note = null;
+                f = list_of_indices_geq_L[0];
+                end_note = voice_noterest_dots_content[f];
+                try {
+                    following_note = voice_noterest_dots_content[f+1];
+                } catch(err) {
+                    following_note = null;
+                }
+                middle_notes = voice_noterest_dots_content.slice(0,f);
+                //DEBUG:
+                var s = null;
+                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+            }
+
+            for (var j = 0; j < list_of_indices_geq_L.length-1; j++) {
+                // Define the sequence of notes
+                o = list_of_indices_geq_L[j];
+                start_note = voice_noterest_dots_content[o];
+                f = list_of_indices_geq_L[j+1];
+                end_note = voice_noterest_dots_content[f];
+                try {
+                    following_note = voice_noterest_dots_content[f+1];
+                } catch(err) {
+                    following_note = null;
+                }
+                middle_notes = voice_noterest_dots_content.slice(o+1,f);
+                //DEBUG:
+                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+                var e = end_note.getAttribute('pname') + end_note.getAttribute('oct') + " " + end_note.getAttribute('dur');
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+            }
+
+            // If the last note on the voice_noterest_dots_content isn't a longa (or maxima):
+            var index_last_noterest = voice_noterest_dots_content.length - 1;
+            if (!(list_of_indices_geq_L.includes(index_last_noterest))) {
+                o = list_of_indices_geq_L[list_of_indices_geq_L.length - 1];
+                start_note = voice_noterest_dots_content[o];
+                end_note = null;
+                following_note = null;
+                middle_notes = voice_noterest_dots_content.slice(o+1,index_last_noterest+1);
+                //DEBUG:
+                var s = start_note.getAttribute('pname') + start_note.getAttribute('oct') + " " + start_note.getAttribute('dur');
+                var e = null;
+                var m = "";
+                for (var midnote of middle_notes){
+                    var attribs = midnote.getAttribute('pname') + midnote.getAttribute('oct') + " " + midnote.getAttribute('dur');
+                    if (attribs == '0 null'){
+                        m += midnote.tagName + ", ";
+                    } else {
+                        m += attribs + ", ";
+                    }
+                } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
+                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+            }
         }
 
     }
 
-    replace_ligatures_by_brackets(quasiscore_mensural_doc);
     replace_maximas_by_duplexlongas(quasiscore_mensural_doc);
 
     return quasiscore_mensural_doc;
