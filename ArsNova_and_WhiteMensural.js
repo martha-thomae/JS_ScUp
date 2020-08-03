@@ -831,15 +831,17 @@ function process_augdots(modusmaior, modusminor, tempus, prolatio, staff) {
     var mensuration = [modusmaior, modusminor, tempus, prolatio];
     var notes_NoDivisionDot_possibility = [];
     var k = 0;
-    var acum_boolean =  mensuration[0];
+    var acum_boolean = 1 * mensuration[0];
+    //console.log("acum_boolean:");
+    //console.log(acum_boolean);
     while (acum_boolean % 2 == 0) {
         notes_NoDivisionDot_possibility.push(note_level[k]);
         k += 1;
         try {
-            acum_boolean += mensuration[k];
+            acum_boolean += (1 * mensuration[k]);
         } catch(err) {
             break;
-        }
+        }//console.log(acum_boolean);
     }
     //console.log(acum_boolean);
     //console.log(notes_NoDivisionDot_possibility);
