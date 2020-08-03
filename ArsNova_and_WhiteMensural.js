@@ -805,6 +805,73 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     }
 }
 
+function replace_perfdots_by_divdots(meiDoc){
+    // Replace dots of perfection (which I encoded with @form='perf') by dots of division (@form='div')
+    const dots = meiDoc.getElementsByTagName('dot');
+    for (var dot of dots) {
+        // Find all dots classified as dots of 'perfection'
+        if (dot.hasAttribute('form') && dot.getAttribute('form') == 'perf') {
+            // Substitute them by dots of 'division'
+            dot.setAttribute('form', 'div');
+        }
+    }
+}
+
+function process_augdots(modusmaior, modusminor, tempus, prolatio, staff) {
+    // There are notes that, when dotted, the dot used must be a dot of augmentation
+    // Only imperfect notes can be augmented by a dot, but not all dots in them are augmentation dots
+    // These imperfect notes can be followed by a division dot, as they can form a perfection with a larger note.
+    // If a note is perfect (according to the mensuration), by the functions above, all the dotted notes
+    // with smaller values are examined to determine if the dot is a 'division dot' or an 'augmentation dot';
+    // but in case of larger values, this is not evaluated in the previous functions.
+
+    // The following code performs this action. It goes from 'maxima' to 'semibrevis', until if finds a perfect mensuration.
+    // All the notes larger than that perfect note are considered to be augmented by any dot following them.
+    var note_level = ['maxima', 'longa', 'brevis', 'semibrevis'];
+    var mensuration = [modusmaior, modusminor, tempus, prolatio];
+    var notes_NoDivisionDot_possibility = [];
+    var k = 0;
+    var acum_boolean =  mensuration[0];
+    while (acum_boolean % 2 == 0) {
+        notes_NoDivisionDot_possibility.push(note_level[k]);
+        k += 1;
+        try {
+            acum_boolean += mensuration[k];
+        } catch(err) {
+            break;
+        }
+    }
+    //console.log(acum_boolean);
+    //console.log(notes_NoDivisionDot_possibility);
+
+    var dots, dot, dotted_note, dur_dotted_note;
+    if (notes_NoDivisionDot_possibility.length != 0) {
+        dots = staff.getElementsByTagName('dot');
+        if (notes_NoDivisionDot_possibility.length == 4) {
+            for (dot of dots) {
+                dot.setAttribute('form', 'aug');
+                dotted_note = get_preceding_noterest(dot);
+                dotted_note.setAttribute('dur.quality', 'perfecta');
+                dotted_note.setAttribute('num', '2');
+                dotted_note.setAttribute('numbase', '3');
+            }
+        } else {
+            for (dot of dots) {
+                dotted_note = get_preceding_noterest(dot);
+                // The preceding element of a dot should be either a <note> or a <rest>, so the following variable (dur_dotted_note) should be well defined
+                dur_dotted_note = dotted_note.getAttribute('dur');
+                if (notes_NoDivisionDot_possibility.includes(dur_dotted_note)) {
+                    // Augmentation dot
+                    dot.setAttribute('form', 'aug');
+                    dotted_note.setAttribute('dur.quality', 'perfecta');
+                    dotted_note.setAttribute('num', '2');
+                    dotted_note.setAttribute('numbase', '3');
+                }
+            }
+        }
+    }
+}
+
 // Main function
 const lining_up = quasiscore_mensural_doc => {
     // For each voice (staff element) in the "score"
@@ -1049,7 +1116,7 @@ const lining_up = quasiscore_mensural_doc => {
                     m += attribs + ", ";
                 }
             } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
-            
+
             breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, modusminor, note_durs, undotted_note_gain, dotted_note_gain);
         }
 
@@ -1138,60 +1205,10 @@ const lining_up = quasiscore_mensural_doc => {
                 breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
             }
         }
-
-
-        // There are notes that, when dotted, the dot used must be a dot of augmentation
-        // Only imperfect notes can be augmented by a dot, but not all dots in them are augmentation dots
-        // These imperfect notes can be followed by a division dot, as they can form a perfection with a larger note.
-        // If a note is perfect, by the functions above all the dotted notes with smaller values are examined to determine if the dot is a 'division dot' or an 'augmentation dot'
-        // But in case of larger values, this is not evaluated.
-        // The following code performs that action. It goes from 'maxima' to 'semibrevis', until if finds a perfect mensuration.
-        // All the notes larger than that perfect note are considered to be augmented by any dot following them.
-
-        var note_level = ['maxima', 'longa', 'brevis', 'semibrevis'];
-        var mensuration = [modusmaior, modusminor, tempus, prolatio];
-        var notes_NoDivisionDot_possibility = [];
-        var k = 0;
-        var acum_boolean =  mensuration[0];
-        while (acum_boolean % 2 == 0) {
-            notes_NoDivisionDot_possibility.push(note_level[k]);
-            k += 1;
-            try {
-                acum_boolean += mensuration[k];
-            } catch(err) {
-                break;
-            }
-        }
-        //console.log(acum_boolean);
-        //console.log(notes_NoDivisionDot_possibility);
-
-        var dots, dot, dotted_note, dur_dotted_note;
-        if (notes_NoDivisionDot_possibility.length != 0) {
-            dots = staff.getElementsByTagName('dot');
-            if (notes_NoDivisionDot_possibility.length == 4) {
-                for (dot of dots) {
-                    dot.setAttribute('form', 'aug');
-                    dotted_note = get_preceding_noterest(dot);
-                    dotted_note.setAttribute('dur.quality', 'perfecta');
-                    dotted_note.setAttribute('num', '2');
-                    dotted_note.setAttribute('numbase', '3');
-                }
-            } else {
-                for (dot of dots) {
-                    dotted_note = get_preceding_noterest(dot);
-                    // The preceding element of a dot should be either a <note> or a <rest>, so the following variable (dur_dotted_note) should be well defined
-                    dur_dotted_note = dotted_note.getAttribute('dur');
-                    if (notes_NoDivisionDot_possibility.includes(dur_dotted_note)) {
-                        // Augmentation dot
-                        dot.setAttribute('form', 'aug');
-                        dotted_note.setAttribute('dur.quality', 'perfecta');
-                        dotted_note.setAttribute('num', '2');
-                        dotted_note.setAttribute('numbase', '3');
-                    }
-                }
-            }
-        }
     }
+
+    process_augdots(modusmaior, modusminor, tempus, prolatio, staff);
+    replace_perfdots_by_divdots(quasiscore_mensural_doc);
 
     return quasiscore_mensural_doc;
 };

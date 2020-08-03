@@ -345,38 +345,6 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     } // Else (@modusminor = 2), no modification on the long-breve level is needed
 }
 
-function replace_ligatures_by_brackets(meiDoc){
-    // Replace all ligatures by <bracketSpan> elements located at the end of the <section>
-    const section = meiDoc.getElementsByTagName('section')[0];
-    // First, retrieve all ligatures
-    const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
-    // Then, for each ligature
-    for (var ligature of ligatures) {
-        // 1. Take the notes contained within that <ligature>
-        // and incorporate them into the stream of notes of the <layer>
-        var parent = ligature.parentElement;
-        var ligated_notes = Array.from(ligature.children);
-        for (var note of ligated_notes) {
-            parent.insertBefore(note, ligature);
-        }
-        // 2. And create the <bracketSpan> element to replace the ligature
-        var bracketSpan = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'bracketSpan');
-        bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
-        // With @startid and @endid pointing to the start and end of the ligature
-        var start_note = ligated_notes[0];
-        var end_note = ligated_notes[ligated_notes.length - 1];
-        bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
-        bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
-        // And with attributes corresponding to a mensural ligature
-        bracketSpan.setAttribute('func', 'ligature');
-        bracketSpan.setAttribute('lform', 'solid');
-        // 3. Remove the ligature
-        parent.removeChild(ligature);
-        // 4. Add the <bracketSpan> to the end of <section>
-        section.appendChild(bracketSpan);
-    }
-}
-
 function replace_maximas_by_duplexlongas(meiDoc){
     const notes = Array.from(meiDoc.getElementsByTagName('note'));
     for (var note of notes) {
@@ -633,7 +601,6 @@ const lining_up = quasiscore_mensural_doc => {
 
     }
 
-    replace_ligatures_by_brackets(quasiscore_mensural_doc);
     replace_maximas_by_duplexlongas(quasiscore_mensural_doc);
 
     return quasiscore_mensural_doc;
