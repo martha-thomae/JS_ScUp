@@ -182,7 +182,11 @@ switch (notation){
                 break;
         }break;
 }
-finalScoreDoc = PostProcess.refine_score(scoreDoc, true, true);
+
+PostProcess.replace_ligatures_by_brackets(scoreDoc);
+PostProcess.remove_num_and_numbase(scoreDoc);
+
+var finalScoreDoc = PostProcess.refine_score(scoreDoc, true, true);
 
 const serializer = new XMLSerializer();
 const content = serializer.serializeToString(finalScoreDoc);

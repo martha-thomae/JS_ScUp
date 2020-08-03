@@ -1,5 +1,5 @@
 /*
-    POST-PROCESSING
+    OPTIONAL POST-PROCESSING
 
     Post-processing methods (to be selected by the user), including:
     - Change to modern clefs
@@ -234,8 +234,14 @@ const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
 
 exports.refine_score = refine_score;
 
+/*
+    REQUIRED POST-PROCESSING:
 
-function replace_ligatures_by_brackets(meiDoc){
+    - Replace ligatures by brackets (otherwise, vertical alignment is not visible within ligatures)
+    - Remove @num and @numbase attributes when @dur.quality is used (to make it MEI-compliant)
+*/
+
+const replace_ligatures_by_brackets = (meiDoc) => {
     // Replace all ligatures by <bracketSpan> elements located at the end of the <section>
     const section = meiDoc.getElementsByTagName('section')[0];
     // First, retrieve all ligatures
@@ -265,9 +271,9 @@ function replace_ligatures_by_brackets(meiDoc){
         // 4. Add the <bracketSpan> to the end of <section>
         section.appendChild(bracketSpan);
     }
-}
+};
 
-function remove_num_and_numbase(meiDoc){
+const remove_num_and_numbase = (meiDoc) => {
     // Remove the attributes @num and @numbase when a @dur.quality attribute is presesnt
     const notes = meiDoc.getElementsByTagName('note');
     for (var note of notes) {
@@ -276,4 +282,7 @@ function remove_num_and_numbase(meiDoc){
             note.removeAttribute('numbase');
         }
     }
-}
+};
+
+exports.replace_ligatures_by_brackets = replace_ligatures_by_brackets;
+exports.remove_num_and_numbase = remove_num_and_numbase;
