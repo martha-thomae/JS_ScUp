@@ -8,5 +8,6 @@ module.exports = {
   merge: MergeModule.merge,
   ArsAntiqua: ArsAntiqua,
   ArsNova: ArsNova,
-  refineScore: PostProcessing.refine_score,
+  refineScore: PostProcessing.refine_score, // Kept for backwards compatibility. Remove in next major version.
+  PostProcessing: PostProcessing,
 };
