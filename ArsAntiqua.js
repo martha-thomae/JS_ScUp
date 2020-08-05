@@ -345,6 +345,7 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     } // Else (@modusminor = 2), no modification on the long-breve level is needed
 }
 
+// Post-processing functions
 function replace_maximas_by_duplexlongas(meiDoc){
     const notes = Array.from(meiDoc.getElementsByTagName('note'));
     for (var note of notes) {

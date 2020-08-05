@@ -306,6 +306,9 @@ function modification(counter, start_note, middle_notes, end_note, following_not
     }
 }
 
+// 'Processing functions'
+// Determining the number of minims, semibreves, or breves between the boundaries (start_note and end_note) of a sequence of notes.
+//(This number is used by the 'modification' function to apply the right modifications to the sequence.)
 function minims_between_semibreves_processing(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain) {
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
@@ -658,6 +661,38 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
     }
 }
 
+// Based on the mensuration, call the appropriate 'processing' function
+function minims_between_semibreves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
+    if (prolatio == 3) {
+        minims_between_semibreves_processing(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
+    } // Else (@prolatio = 2), no modification on the semibreve-minim level is needed
+}
+
+function sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
+    if (tempus == 3) {
+        sb_between_breves_processing(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
+    } // Else (@tempus = 2), no modification on the breve-semibreve level is needed
+}
+
+function breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, modusminor, note_durs, undotted_note_gain, dotted_note_gain) {
+    // Use the counter of minims to determine the total of breves in the middle_notes 
+    if (modusminor == 3) {
+        breves_between_longas_processing(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
+    } else {
+        // @modusminor = 2, no modification on the long-breve level is needed
+        // Only display the results:
+        var minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+        //var minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus, modusminor, null);
+        console.log("TOTAL (m): " + minim_counter);
+        var sb_counter = minim_counter / prolatio;
+        console.log("TOTAL (Sb): " + sb_counter);
+        var count_B = sb_counter / tempus;
+        console.log("TOTAL (B):  " + count_B);
+        console.log();
+    }
+}
+
+// Coloration-related functions:
 function find_note_level_of_coloration(modusmaior, modusminor, tempus, prolatio, colored_figures) {
     // Determine the note-level at which coloration is working (i.e., the perfect note it is meant to imperfect)
     var coloration_level;
@@ -775,36 +810,7 @@ function coloration_effect(notes_and_rests_per_voice, modusmaior, modusminor, te
     }
 }
 
-function minims_between_semibreves(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain) {
-    if (prolatio == 3) {
-        minims_between_semibreves_processing(start_note, middle_notes, end_note, following_note, note_durs, undotted_note_gain, dotted_note_gain);
-    } // Else (@prolatio = 2), no modification on the semibreve-minim level is needed
-}
-
-function sb_between_breves(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
-    if (tempus == 3) {
-        sb_between_breves_processing(start_note, middle_notes, end_note, following_note, prolatio, note_durs, undotted_note_gain, dotted_note_gain);
-    } // Else (@tempus = 2), no modification on the breve-semibreve level is needed
-}
-
-function breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, modusminor, note_durs, undotted_note_gain, dotted_note_gain) {
-    // Use the counter of minims to determine the total of breves in the middle_notes 
-    if (modusminor == 3) {
-        breves_between_longas_processing(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain);
-    } else {
-        // @modusminor = 2, no modification on the long-breve level is needed
-        // Only display the results:
-        var minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
-        //var minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus, modusminor, null);
-        console.log("TOTAL (m): " + minim_counter);
-        var sb_counter = minim_counter / prolatio;
-        console.log("TOTAL (Sb): " + sb_counter);
-        var count_B = sb_counter / tempus;
-        console.log("TOTAL (B):  " + count_B);
-        console.log();
-    }
-}
-
+// Post processing functions
 function replace_perfdots_by_divdots(meiDoc){
     // Replace dots of perfection (which I encoded with @form='perf') by dots of division (@form='div')
     const dots = meiDoc.getElementsByTagName('dot');
@@ -1204,7 +1210,7 @@ const lining_up = quasiscore_mensural_doc => {
                     }
                 } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
 
-                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, modusminor, note_durs, undotted_note_gain, dotted_note_gain);
             }
         }
     }
