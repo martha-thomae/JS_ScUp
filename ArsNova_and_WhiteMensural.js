@@ -1204,7 +1204,7 @@ const lining_up = quasiscore_mensural_doc => {
                     }
                 } console.log("Delimited Sequence of Breves: " + s + ", " + m + e);
 
-                breves_between_longas(start_note, middle_notes, end_note, following_note, tempus, note_durs, undotted_note_gain, modusminor);
+                breves_between_longas(start_note, middle_notes, end_note, following_note, prolatio, tempus, modusminor, note_durs, undotted_note_gain, dotted_note_gain);
             }
         }
     }
