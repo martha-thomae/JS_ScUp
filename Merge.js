@@ -19,27 +19,28 @@ function cleanup(meiDoc) {
 }
 
 function clef_definition(staff, staffDef) {
-    // Remove all <clef> elements of a voice (i.e., <staff>),
-    // except if they encode a change in clef.
+    // Retrieving all <clef> elements of the given voice, and finding the initial clef
     const clefs = Array.from(staff.getElementsByTagName('clef'));
     const initialClef = clefs[0];
-    const initialClef_line = initialClef.getAttribute('line');
-    const initialClef_shape = initialClef.getAttribute('shape');
-    var parent;
-    for (var i = 0; i < clefs.length; i ++) {
-        var clef = clefs[i];
-        // If the i-th <clef> element encodes the same clef as
-        // the one at the beginning of the voice, remove it.
-        if (clef.getAttribute('line') == initialClef_line && clef.getAttribute('shape') == initialClef_shape) {
-            parent = clef.parentElement;
-            parent.removeChild(clef);
-        }
-    }
     // Encode the first clef of the voice (initialClef) within <staffDef>
     for (var attribute_name of initialClef.getAttributeNames()){
         if (attribute_name != 'xml:id') {
             var attribute_value = initialClef.getAttribute(attribute_name);
             staffDef.setAttribute('clef.'+attribute_name, attribute_value);
+        }
+    } // Remove the corresponding <clef> element
+    var parent = initialClef.parentElement;
+    parent.removeChild(initialClef);
+    // Remove all remaining <clef> elements of the voice
+    // except the ones encoding a change in clef.
+    for (var i = 1; i < clefs.length; i ++) {
+        var clef = clefs[i];
+        var prev_clef = clefs[i-1];
+        // If the i-th <clef> element encodes the same clef as
+        // the previous <clef> element (i-1), remove it.
+        if (clef.getAttribute('line') == prev_clef.getAttribute('line') && clef.getAttribute('shape') == prev_clef.getAttribute('shape')) {
+            parent = clef.parentElement;
+            parent.removeChild(clef);
         }
     }
 }
