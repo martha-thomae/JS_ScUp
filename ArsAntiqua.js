@@ -25,6 +25,13 @@ function get_preceding_noterest(target_element) {
     } return preceding_element;
 }
 
+function get_following_noterest(target_element) {
+    var following_element = target_element.nextSibling;
+    while (following_element.tagName != 'note' && following_element.tagName != 'rest'){
+        following_element = following_element.nextSibling;
+    } return following_element;
+}
+
 // Boolean function evaluating the condition 'followed by dot'
 function followed_by_dot(target_element) {
     var next_element = target_element.nextSibling;
@@ -33,6 +40,16 @@ function followed_by_dot(target_element) {
     } else {
         return false;
     }
+}
+
+function find_first_dotted_note(sequence) {
+    var first_dotted_note;
+    for (var midnote of sequence) {
+        if (followed_by_dot(midnote)){
+            first_dotted_note = midnote;
+            break;
+        }
+    } return first_dotted_note;
 }
 
 // Functions related to the counting of minims in a sequence of notes
@@ -63,9 +80,36 @@ function has_been_modified(note) {
     return (note.hasAttribute('num') && note.hasAttribute('numbase'));
 }
 
+function dot_of_imperfection(sequence, note_durs, undotted_note_gain, tempus, count_B) {
+    var status = false;
+    var first_dotted_note = find_first_dotted_note(sequence);
+    // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
+    // Then count the number of breves in each of the two parts to discover if this 'dot' is a
+    // 'dot of division' or a 'dot of addition'
+    var part1_middle_notes = sequence.slice(0, sequence.indexOf(first_dotted_note) + 1);
+
+    // Breves BEFORE the first dot
+    var sb_counter1 = counting_semibreves(part1_middle_notes, note_durs, undotted_note_gain);
+    var part1_count_B = sb_counter1 / tempus;
+
+    // If there is just one breve before the first dot
+    // And two/three breves between the longs (only case where a dot
+    // of imperfectionis used to change the default interpretation)
+    if (part1_count_B == 1 && (count_B == 2 || count_B == 3)) {
+        status = true;
+        var dur_before_dot = first_dotted_note.getAttribute('dur');
+        var dur_after_dot = get_following_noterest(first_dotted_note).getAttribute('dur');
+        // Muris: But if the dot is placed between two semibreves,
+        // it is attributed with division of tempus
+        if (dur_before_dot == 'semibrevis' && dur_after_dot == 'semibrevis') {
+            status = false;
+        }
+    } return status;
+}
+
 // Given the total amount of "breves" in-between the "longs", see if they can be arranged in groups of 3
 // According to how many breves remain ungrouped (1, 2 or 0), modifiy the duration of the appropriate note of the sequence ('imperfection', 'alteration', no-modification)
-function modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note) {
+function modification(counter, start_note, middle_notes, end_note, following_note, short_note, long_note, note_durs, undotted_note_gain, tempus) {
     var last_middle_note, last_uncolored_note;
 
     switch(counter % 3) {
@@ -117,8 +161,25 @@ function modification(counter, start_note, middle_notes, end_note, following_not
             if (counter == 2) { // 2 exact breves between the longs
 
                 if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))) {
-                // Default case
-                    // Alteration
+                    // Exception (dot of imperfection)
+                    if (dot_of_imperfection(middle_notes, note_durs, undotted_note_gain, tempus, counter)) {
+                        console.log("Alternative Case:  Imperfection a.p.p. & Imperfection a.p.a.\n");
+                        // Imperfection a.p.p.
+                        start_note.setAttribute('dur.quality', 'imperfecta');
+                        start_note.setAttribute('num', '3');
+                        start_note.setAttribute('numbase', '2');
+                        // Imperfection a.p.a.
+                        end_note.setAttribute('dur.quality', 'imperfecta');
+                        end_note.setAttribute('num', '3');
+                        end_note.setAttribute('numbase', '2');
+                        // Raise a warning when this imperfect note is followed by a perfect note (contradiction with the first rule)
+                        if (following_note != null && following_note.getAttribute('dur') == long_note) {
+                            console.log("WARNING 2! An imperfection a.p.a. is required, but this imperfect note is followed by a perfect note, this contradicts the fundamental rule: 'A note is perfect before another one of the same kind'.");
+                            console.log("The imperfected note is " + end_note + " and is followed by the perfect note " + following_note);
+                            console.log("\n");
+                        }
+                    }
+                    // Default case: Alteration
                     console.log("Default Case:\tAlteration\n");
                     last_uncolored_note.setAttribute('dur.quality', 'altera');
                     last_uncolored_note.setAttribute('num', '1');
@@ -221,9 +282,40 @@ function modification(counter, start_note, middle_notes, end_note, following_not
 
         case 0: // 0 breves left out:
 
-            if (counter <= 3) {
-                // When 0 or 3 breves left out, no modifications to perform
+            if (counter == 0) {
+                // When 0 breves left out, no modifications to perform
                 console.log("Default Case:\tNo modifications\n");
+            }
+
+            else if (counter == 3) {
+                // One of the possibilities when 3 breves are left out, involves alteration
+                // One must alter the last (uncolored) note from the middle_notes of the sequence
+                last_middle_note = middle_notes[middle_notes.length - 1];
+                // If the last note is uncolored, it is a candidate for alteration (given that it is a note and not a rest, and that it is a breve and not a smaller value)
+                last_uncolored_note = last_middle_note;
+                // But if it is colored, we need to find the last "uncolored" note, as this is the one that would be altered
+                while (last_uncolored_note.hasAttribute('colored')) {
+                    last_uncolored_note = get_preceding_noterest(last_uncolored_note);
+                }
+
+                // When 3 breves left out, no modifications to perform,
+                // Except in the presence of a dot of imperfection
+                if (dot_of_imperfection(middle_notes, note_durs, undotted_note_gain, tempus, counter)) {
+                // Exception: dot of imperfection
+                    console.log("Default Case:\tImperfection a.p.p. & Alteration\n");
+                    // Imperfection a.p.p.
+                    start_note.setAttribute('dur.quality', 'imperfecta');
+                    start_note.setAttribute('num', '3');
+                    start_note.setAttribute('numbase', '2');
+                    // Alteration
+                    last_uncolored_note.setAttribute('dur.quality', 'altera');
+                    last_uncolored_note.setAttribute('num', '1');
+                    last_uncolored_note.setAttribute('numbase', '2');
+                } else {
+                // Default Case
+                    // When 3 breves left out, no modifications to perform
+                    console.log("Default Case:\tNo modifications\n");
+                }
             }
 
             else {
@@ -249,12 +341,10 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                     last_uncolored_note.setAttribute('num', '1');
                     last_uncolored_note.setAttribute('numbase', '2');
                 }
-
                 else {// Exception Case:
                     console.log("Alternative Case:  No modifications\n");
                     // Start note remains perfect
                 }
-
             } break;
     }
 }
@@ -351,7 +441,7 @@ function breves_between_longas(start_note, middle_notes, end_note, following_not
     console.log();
 
     if (modusminor == 3){
-        modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa');
+        modification(count_B, start_note, sequence_of_middle_notes, end_note, following_note, 'brevis', 'longa', note_durs, undotted_note_gain, tempus);
     } // Else (@modusminor = 2), no modification on the long-breve level is needed
 }
 
