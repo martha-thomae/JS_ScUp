@@ -892,7 +892,7 @@ function process_augdots(modusmaior, modusminor, tempus, prolatio, staff) {
 // Process: It divides the music content into subsequences bounded by perfect notes. Then,
 // each subsequence is processed to find which notes should be modified based on the context
 
-function lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, voice_content) {
+function lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, voice_content, staff) {
 
     // Individual note values and gains, according to the mensuration
     var note_durs = ['semifusa', 'fusa', 'semiminima', 'minima', 'semibrevis', 'brevis', 'longa', 'maxima'];
@@ -1237,7 +1237,7 @@ const lining_up = quasiscore_mensural_doc => {
 
         // B. Get the voice content
         var staff = staves[i];
-        var voice_content = staff.getElementsByTagName('layer')[0].children;
+        var voice_content = Array.from(staff.getElementsByTagName('layer')[0].children);
 
         // C. Retrieve all mensur elements in the voice (are there chagnes in mensuration?)
         const mensur_elements = Array.from(staff.getElementsByTagName('mensur'));
@@ -1245,17 +1245,23 @@ const lining_up = quasiscore_mensural_doc => {
         // If there are any, separate the voice_content into chunks (of fixed mensuration)
         // and process each of them individually by calling the lineup_mensur_section function
         if (mensur_elements.length == 0) {
-            lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, voice_content);
+            lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, voice_content, staff);
         } else {
             var start, mensur_index, chunk;
             start = 0;
-            for (var j=0; j < mensur_elements.length; j++) {
-                mensur_index = voice_content.indexOf(mensur_elements[j]);
+            for (var mensur of mensur_elements) {
+                // Retrieve notes for that chunk
+                mensur_index = voice_content.indexOf(mensur);
                 chunk = voice_content.slice(start, mensur_index);
-                lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, chunk);
+                lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, chunk, staff);
+                // Update mensuration and starting parameters for next chunk
                 start = mensur_index + 1;
+                prolatio = mensur.getAttribute('prolatio');
+                tempus = mensur.getAttribute('tempus');
+                modusminor = mensur.getAttribute('modusminor');
+                modusmaior = mensur.getAttribute('modusmaior');
             }chunk = voice_content.slice(start,);
-            lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, chunk);
+            lineup_mensur_section(prolatio, tempus, modusminor, modusmaior, chunk, staff);
         }
     }
     // Post-processing: All dots of perfection (which for now have a @form = 'perf')
