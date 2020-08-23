@@ -250,7 +250,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) && (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)) && !(followed_by_dot(end_note)))) {
                     // Check if imperfection a.p.a. enters or not in conflict with rule # 1.
                     if (following_note != null && following_note.getAttribute('dur') == long_note) {
-                        // If it does, imperfection a.p.a. is discarded, except if the "alterantive interpretation" (the 'Exception Case') is also forbidden
+                        // If it does, imperfection a.p.a. is discarded, except if the "alternative interpretation" (the 'Exception Case') is also forbidden
                         if (last_uncolored_note.tagName == 'note' && last_uncolored_note.getAttribute('dur') == short_note && !(has_been_modified(last_uncolored_note))) {
                         // Exception Case
                             // Alteration
@@ -332,7 +332,7 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                 // Except in the presence of a dot of imperfection
                 if (dot_of_imperfection(middle_notes, note_durs, undotted_note_gain, tempus, counter)) {
                 // Exception: dot of imperfection
-                    console.log("Alterantive Case:\tImperfection a.p.p. & Alteration\n");
+                    console.log("Alternative Case:\tImperfection a.p.p. & Alteration\n");
                     // Imperfection a.p.p.
                     start_note.setAttribute('dur.quality', 'imperfecta');
                     start_note.setAttribute('num', '3');
