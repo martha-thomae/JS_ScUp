@@ -184,7 +184,7 @@ switch (notation){
 }
 
 PostProcess.replace_ligatures_by_brackets(scoreDoc);
-PostProcess.remove_num_and_numbase(scoreDoc);
+//PostProcess.remove_num_and_numbase(scoreDoc);
 
 var finalScoreDoc = PostProcess.refine_score(scoreDoc, true, true);
 
