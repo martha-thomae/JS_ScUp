@@ -89,11 +89,11 @@ function add_sb_value(meiDoc) {
     var stavesDef = meiDoc.getElementsByTagName('staffDef');
     // For each voice in the "score"
     for (var i = 0; i < stavesDef.length; i++){
-        var staffDef = stavesDef[i];
+        var staffDef_mensur = stavesDef[i].getElementsByTagName('mensur')[0];
         var staff = staves[i];
         // 1. Get the mensuration of the voice (prolatio is irrelevant in Ars antiqua)
-        var modusminor = staffDef.getAttribute('modusminor');
-        var tempus = staffDef.getAttribute('tempus');
+        var modusminor = staffDef_mensur.getAttribute('modusminor');
+        var tempus = staffDef_mensur.getAttribute('tempus');
         // If there is no @tempus attribute in the <staffDef>, give the variable tempus a default value of 3.
         // The missing @tempus attribute in a voice represents the lack of semibreves that voice.
         // Therefore, the default value of the variable tempus can be either 2 or 3 (here I decided on 3).
@@ -166,7 +166,8 @@ function add_barlines(meiDoc){
     // For each voice in the "score"
     for (var i = 0; i < stavesDef.length; i++){
         // Get the corresponding <staff> and <staffDef> elements
-        var staffDef = stavesDef[i];
+        // (or, more precisely, the <mensur> element within <staffDef>)
+        var staffDef_mensur = stavesDef[i].getElementsByTagName('mensur')[0];
         var staff = staves[i];
         // Obtain the ORDERED sequence of notes and rests within that voice
         var staff_layer = staff.children[0];
@@ -195,8 +196,8 @@ function add_barlines(meiDoc){
         // Determine the locations were barlines can be added
         // This is, where the note offset coincides with the bar-length
         // 1. Define the bar-length to be the length of a longa (in semibreves)
-        var modusminor = staffDef.getAttribute('modusminor');
-        var tempus = staffDef.getAttribute('tempus');
+        var modusminor = staffDef_mensur.getAttribute('modusminor');
+        var tempus = staffDef_mensur.getAttribute('tempus');
         if (tempus == null){tempus = 3;}
         var barLength = modusminor * tempus;
         console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength + ' Sb');

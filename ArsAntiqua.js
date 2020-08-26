@@ -476,12 +476,12 @@ const lining_up = quasiscore_mensural_doc => {
     var stavesDef = quasiscore_mensural_doc.getElementsByTagName('staffDef');
     for (var i = 0; i < stavesDef.length; i++){
         console.log('\nVoice # ' + (i + 1) + ' results:\n');
-        var staffDef = stavesDef[i];
+        var staffDef_mensur = stavesDef[i].getElementsByTagName('mensur')[0];
         var staff = staves[i];
 
         // Getting the mensuration information of the voice (prolatio is irrelevant in Ars antiqua)
-        var tempus = staffDef.getAttribute('tempus');
-        var modusminor = staffDef.getAttribute('modusminor');
+        var tempus = staffDef_mensur.getAttribute('tempus');
+        var modusminor = staffDef_mensur.getAttribute('modusminor');
 
         // If there is no @tempus attribute in the <staffDef>, give the variable tempus a default value of 3.
         // The missing @tempus attribute in a voice represents the lack of semibreves that voice.

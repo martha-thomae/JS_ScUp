@@ -1229,11 +1229,11 @@ const lining_up = quasiscore_mensural_doc => {
         console.log('\nVoice # ' + (i + 1) + ' results:\n');
 
         // A. Get the mensuration information of the voice
-        var staffDef = stavesDef[i];
-        var prolatio = staffDef.getAttribute('prolatio');
-        var tempus = staffDef.getAttribute('tempus');
-        var modusminor = staffDef.getAttribute('modusminor');
-        var modusmaior = staffDef.getAttribute('modusmaior');
+        var staffDef_mensur = stavesDef[i].getElementsByTagName('mensur')[0];
+        var prolatio = staffDef_mensur.getAttribute('prolatio');
+        var tempus = staffDef_mensur.getAttribute('tempus');
+        var modusminor = staffDef_mensur.getAttribute('modusminor');
+        var modusmaior = staffDef_mensur.getAttribute('modusmaior');
 
         // B. Get the voice content
         var staff = staves[i];
