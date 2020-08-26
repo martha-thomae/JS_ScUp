@@ -5,6 +5,7 @@
 */
 
 function cleanup(meiDoc) {
+    // Remove <pb> and <sb> elements
     const pb_elements = Array.from(meiDoc.getElementsByTagName('pb'));
     const sb_elements = Array.from(meiDoc.getElementsByTagName('sb'));
     var parent;
