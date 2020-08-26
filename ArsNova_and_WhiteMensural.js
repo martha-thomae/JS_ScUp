@@ -542,7 +542,7 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
 }
 
 function breves_between_longas_processing(start_note, middle_notes, end_note, following_note, prolatio, tempus, note_durs, undotted_note_gain, dotted_note_gain) {
-    no_division_dot_flag = true;    // Default value
+    var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
     var dur, minim_counter, count_B, dot_element, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, part1_count_B, part2_count_B;
