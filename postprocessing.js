@@ -87,10 +87,12 @@ function add_sb_value(meiDoc) {
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
     var staves = meiDoc.getElementsByTagName('staff');
     var stavesDef = meiDoc.getElementsByTagName('staffDef');
+
     // For each voice in the "score"
     for (var i = 0; i < stavesDef.length; i++){
         var staffDef_mensur = stavesDef[i].getElementsByTagName('mensur')[0];
         var staff = staves[i];
+
         // 1. Get the mensuration of the voice (prolatio is irrelevant in Ars antiqua)
         var modusminor = staffDef_mensur.getAttribute('modusminor');
         var tempus = staffDef_mensur.getAttribute('tempus');
@@ -98,6 +100,7 @@ function add_sb_value(meiDoc) {
         // The missing @tempus attribute in a voice represents the lack of semibreves that voice.
         // Therefore, the default value of the variable tempus can be either 2 or 3 (here I decided on 3).
         if (tempus == null){tempus = 3;}
+
         // 2. Determine the value (in semibreves) of each note/rest in the voice. This
         // value is based on the mensuration and the @dur and @dur.quality attributes
         // of the note/rest. The value is encoded temporary as an attribute (@sb_value).
@@ -105,6 +108,7 @@ function add_sb_value(meiDoc) {
         var noteValue;
         for (var noterest of staffNoteRests) {
             switch(noterest.getAttribute('dur')) {
+
                 case 'longa':
                     noteValue = modusminor * tempus;
                     if (noterest.hasAttribute('dur.quality')) {
@@ -120,7 +124,11 @@ function add_sb_value(meiDoc) {
                             case 'duplex':
                                 noteValue = 2 * modusminor * tempus;
                         }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // special case of partial imperfection
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
+
                 case 'brevis':
                     noteValue = tempus;
                     if (noterest.hasAttribute('dur.quality')) {
@@ -136,7 +144,11 @@ function add_sb_value(meiDoc) {
                             case 'altera':
                                 noteValue = 2 * tempus;
                         }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // special case of partial imperfection
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
+
                 case 'semibrevis':
                     noteValue = 1;
                     if (noterest.hasAttribute('dur.quality')) {
@@ -151,9 +163,75 @@ function add_sb_value(meiDoc) {
                                 break;
                         }
                     } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
-                        // special cases of semibreves (more than 2 or 3 per breve)
-                        noteValue = noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                        // special cases of Ars antiqua semibreves (more than 2 or 3 per breve)
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
+
+                case 'minima':
+                    noteValue = 0.5;
+                    if (noterest.hasAttribute('dur.quality')) {
+                        switch (noterest.getAttribute('dur.quality')){
+                            // regular values
+                            case 'perfecta':
+                                noteValue = 0.75;
+                                break;
+                            case 'imperfecta':
+                                noteValue = 0.5;
+                                break;
+                        }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                    }break;
+
+                case 'semiminima':
+                    noteValue = 0.25;
+                    if (noterest.hasAttribute('dur.quality')) {
+                        switch (noterest.getAttribute('dur.quality')){
+                            // regular values
+                            case 'perfecta':
+                                noteValue = 0.375;
+                                break;
+                            case 'imperfecta':
+                                noteValue = 0.25;
+                                break;
+                        }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                    }break;
+
+                case 'fusa':
+                    noteValue = 0.125;
+                    if (noterest.hasAttribute('dur.quality')) {
+                        switch (noterest.getAttribute('dur.quality')){
+                            // regular values
+                            case 'perfecta':
+                                noteValue = 0.1875;
+                                break;
+                            case 'imperfecta':
+                                noteValue = 0.125;
+                                break;
+                        }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                    }break;
+
+                case 'semifusa':
+                    noteValue = 0.0625;
+                    if (noterest.hasAttribute('dur.quality')) {
+                        switch (noterest.getAttribute('dur.quality')){
+                            // regular values
+                            case 'imperfecta':
+                                noteValue = 0.0625;
+                                break;
+                        }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                    }break;
+
             }noterest.setAttribute('sb_value', ''+noteValue);
         }
     }
