@@ -306,10 +306,15 @@ function add_barlines(meiDoc){
             accum += parseFloat(noterest.getAttribute('sb_value'));
             console.log(noterest.tagName + ' ' + noterest.getAttribute('dur') + ' ' + noterest.getAttribute('sb_value'));
             console.log(accum);
-            if (accum % barLength_Sb == 0){
+            // The condition should be accum % barLength_Sb == 0,
+            // but because JavaScript doesn't sum periodic decimals correctly
+            // we are substitutin the original condition by checking that
+            // the division by the barlength provides a number close to an integer
+            if ((accum / barLength_Sb) - parseInt(accum / barLength_Sb) < 0.00001){
                 var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
                 staff_layer.insertBefore(barline, noterest.nextSibling);
+                console.log('---- barline ----');
             }
         }
     }
