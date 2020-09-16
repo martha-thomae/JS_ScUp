@@ -96,12 +96,15 @@ function add_sb_value(meiDoc) {
         // 1. Get the mensuration of the voice (prolatio is irrelevant in Ars antiqua)
         var modusminor = staffDef_mensur.getAttribute('modusminor');
         var tempus = staffDef_mensur.getAttribute('tempus');
+        var prolatio = staffDef_mensur.getAttribute('prolatio');
         // If there is no @tempus attribute in the <staffDef>, give the variable tempus a default value of 3.
         // The missing @tempus attribute in a voice represents the lack of semibreves that voice.
         // Therefore, the default value of the variable tempus can be either 2 or 3 (here I decided on 3).
         if (tempus == null){tempus = 3;}
+        // Same with @prolatio
+        if (prolatio == null){prolatio = 3;}
 
-        // 2. Determine the value (in semibreves) of each note/rest in the voice. This
+        // 2. Determine the value (in minims) of each note/rest in the voice. This
         // value is based on the mensuration and the @dur and @dur.quality attributes
         // of the note/rest. The value is encoded temporary as an attribute (@sb_value).
         var staffNoteRests = Array.from(staff.getElementsByTagName('note')).concat(Array.from(staff.getElementsByTagName('rest')));
@@ -110,19 +113,19 @@ function add_sb_value(meiDoc) {
             switch(noterest.getAttribute('dur')) {
 
                 case 'longa':
-                    noteValue = modusminor * tempus;
+                    noteValue = modusminor * tempus * prolatio;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
                             // regular values
                             case 'perfecta':
-                                noteValue = 3 * tempus;
+                                noteValue = 3 * tempus * prolatio;
                                 break;
                             case 'imperfecta':
-                                noteValue = 2 * tempus;
+                                noteValue = 2 * tempus * prolatio;
                                 break;
                             // twice as long
                             case 'duplex':
-                                noteValue = 2 * modusminor * tempus;
+                                noteValue = 2 * noteValue;
                         }
                     } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
                         // special case of partial imperfection
@@ -130,19 +133,19 @@ function add_sb_value(meiDoc) {
                     }break;
 
                 case 'brevis':
-                    noteValue = tempus;
+                    noteValue = tempus * prolatio;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
                             // regular values
                             case 'perfecta':
-                                noteValue = 3;
+                                noteValue = 3 * prolatio;
                                 break;
                             case 'imperfecta':
-                                noteValue = 2;
+                                noteValue = 2 * prolatio;
                                 break;
                             // twice as long
                             case 'altera':
-                                noteValue = 2 * tempus;
+                                noteValue = 2 * noteValue;
                         }
                     } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
                         // special case of partial imperfection
@@ -150,16 +153,25 @@ function add_sb_value(meiDoc) {
                     }break;
 
                 case 'semibrevis':
-                    noteValue = 1;
+                    noteValue =  prolatio;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
                             // regular
-                            case 'minor':
-                                noteValue = 1;
+                            case 'minor': // Ars antiqua
+                                noteValue = prolatio;
+                                break;
+                            case 'perfecta': // Ars nova & white mensural
+                                noteValue = 3;
+                                break;
+                            case 'imperfecta': // Ars nova & white mensural
+                                noteValue = 2;
                                 break;
                             // twice as long
-                            case 'maior':
-                                noteValue = 2;
+                            case 'maior': // Ars antiqua
+                                noteValue = 2 * noteValue;
+                                break;
+                            case 'altera': // Ars nova & white mensural
+                                noteValue = 2 * noteValue;
                                 break;
                         }
                     } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
@@ -168,6 +180,27 @@ function add_sb_value(meiDoc) {
                     }break;
 
                 case 'minima':
+                    noteValue = 1;
+                    if (noterest.hasAttribute('dur.quality')) {
+                        switch (noterest.getAttribute('dur.quality')){
+                            // regular values
+                            case 'perfecta':
+                                noteValue = 1.5;
+                                break;
+                            case 'imperfecta':
+                                noteValue = 1;
+                                break;
+                            // twice as long
+                            case 'altera':
+                                noteValue = 2 * noteValue;
+                                break;
+                        }
+                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
+                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
+                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
+                    }break;
+
+                case 'semiminima':
                     noteValue = 0.5;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
@@ -184,7 +217,7 @@ function add_sb_value(meiDoc) {
                         noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
 
-                case 'semiminima':
+                case 'fusa':
                     noteValue = 0.25;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
@@ -201,14 +234,11 @@ function add_sb_value(meiDoc) {
                         noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
 
-                case 'fusa':
+                case 'semifusa':
                     noteValue = 0.125;
                     if (noterest.hasAttribute('dur.quality')) {
                         switch (noterest.getAttribute('dur.quality')){
                             // regular values
-                            case 'perfecta':
-                                noteValue = 0.1875;
-                                break;
                             case 'imperfecta':
                                 noteValue = 0.125;
                                 break;
@@ -218,21 +248,8 @@ function add_sb_value(meiDoc) {
                         noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
 
-                case 'semifusa':
-                    noteValue = 0.0625;
-                    if (noterest.hasAttribute('dur.quality')) {
-                        switch (noterest.getAttribute('dur.quality')){
-                            // regular values
-                            case 'imperfecta':
-                                noteValue = 0.0625;
-                                break;
-                        }
-                    } else if (noterest.hasAttribute('num') && noterest.hasAttribute('numbase')) {
-                        // in case num & numbase is used as an alternative to the 'perfecta' / 'imperfecta' quality
-                        noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
-                    }break;
-
-            }noterest.setAttribute('sb_value', ''+noteValue);
+            }noterest.setAttribute('minim_value', ''+(noteValue));
+            noterest.setAttribute('sb_value', ''+(noteValue/prolatio));
         }
     }
 }
@@ -276,9 +293,11 @@ function add_barlines(meiDoc){
         // 1. Define the bar-length to be the length of a longa (in semibreves)
         var modusminor = staffDef_mensur.getAttribute('modusminor');
         var tempus = staffDef_mensur.getAttribute('tempus');
+        var prolatio = staffDef_mensur.getAttribute('prolatio');
         if (tempus == null){tempus = 3;}
-        var barLength = modusminor * tempus;
-        console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength + ' Sb');
+        if (prolatio == null){prolatio = 3;}
+        var barLength_Sb = modusminor * tempus;
+        console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength_Sb + ' Sb');
         // 2. Add the barlines where the accumulated value of the notes (in semibreves,
         // as can be found using the @sb_value added in the 'add_sb_value' function) is
         // equal to the bar-length.
@@ -287,7 +306,7 @@ function add_barlines(meiDoc){
             accum += parseFloat(noterest.getAttribute('sb_value'));
             console.log(noterest.tagName + ' ' + noterest.getAttribute('dur') + ' ' + noterest.getAttribute('sb_value'));
             console.log(accum);
-            if (accum % barLength == 0){
+            if (accum % barLength_Sb == 0){
                 var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
                 staff_layer.insertBefore(barline, noterest.nextSibling);
