@@ -333,7 +333,7 @@ const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
         add_sb_value(scoreDoc);
         add_barlines(scoreDoc);
         // Remove the 'sb_value' attribute for producing a valid file
-        for (var layer of meiDoc.getElementsByTagName('layer')) {
+        for (var layer of scoreDoc.getElementsByTagName('layer')) {
             for (var element of layer.children) {
                 element.removeAttribute('sb_value');
             }
