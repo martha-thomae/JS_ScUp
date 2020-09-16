@@ -248,8 +248,7 @@ function add_sb_value(meiDoc) {
                         noteValue = noteValue * noterest.getAttribute('numbase') / noterest.getAttribute('num');
                     }break;
 
-            }noterest.setAttribute('minim_value', ''+(noteValue));
-            noterest.setAttribute('sb_value', ''+(noteValue/prolatio));
+            }noterest.setAttribute('sb_value', ''+(noteValue/prolatio));
         }
     }
 }
@@ -329,8 +328,16 @@ const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
         mensural_to_modern_clefs(scoreDoc);
     }
     if (add_bars_flag) {
+        // Calculate the values of all notes in semibreves (add_sb_value)
+        // to determine the place where barlines should be added (add_barlines)
         add_sb_value(scoreDoc);
         add_barlines(scoreDoc);
+        // Remove the 'sb_value' attribute for producing a valid file
+        for (var layer of meiDoc.getElementsByTagName('layer')) {
+            for (var element of layer.children) {
+                element.removeAttribute('sb_value');
+            }
+        }
     }
     return scoreDoc;
 };
