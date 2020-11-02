@@ -5,7 +5,7 @@ This scoring-up script consists of a **merge module** and a **set of duration-fi
 
 - The **ArsNova_and_WhiteMensural module** deals with the context-dependent nature of the notation by implementing the _principles of imperfection and alteration_—outlined by Franco of Cologne (ca. 1280) and Willi Apel. It also includes functions for: distinguishing between dots of division and dots of augmentation, handling hemiola coloration, dealing with the simultaneous use of perfect mensurations at different note levels. A newly introduced feature is the capability of dealing with changes of mensuration within a voice.
 
-- The **ArsAntiqua module** handles Franconian notation, interpreting groups of semibreves as pointed out by Franco's _Ars cantus mensurabilis_ (ca. 1280) for ternary and binary division of the breve. It also has support for repeating tenors, expanding the set of notes of the repeated tenor in the score representation.
+- The **ArsAntiqua module** handles Franconian notation, interpreting groups of semibreves as pointed out by Franco's _Ars cantus mensurabilis_ (ca. 1280) for ternary and binary division of the breve. It also supports repeating tenors, expanding the set of notes of the repeated tenor in the score representation.
 
 ## Requirements
 - [Node.js](https://nodejs.org/en/)
