@@ -11,7 +11,7 @@ This scoring-up script consists of a **merge module** and a **set of duration-fi
 - [Node.js](https://nodejs.org/en/)
 
 ## Usage
-The mensural scoring-up tool presented in this repository is meant to be used within the [Measuring Polyphony Editor (MP-Editor)](https://github.com/MeasuringPolyphony/mp_editor). The code contained in this repository is a re-implementation of the [Ptyon Scoring-up script](https://github.com/elvis-project/scoring-up) into JavaScript so that it could be easily integrated into a web app.
+The mensural scoring-up tool presented in this repository is meant to be used within the [Measuring Polyphony Editor (MP-Editor)](https://github.com/MeasuringPolyphony/mp_editor). The code contained in this repository is a re-implementation of the [Python Scoring-up script](https://github.com/elvis-project/scoring-up) into JavaScript so that it could be easily integrated into a web app.
 
 The MP-Editor is used to enter the notes in the systems of each of the parts/voices of a mensural piece, which can be exported into a Mensural MEI parts-based file (an MEI file encoding mensural notation in `<parts>`). One can also request the MP-Editor to line up the entered parts into a score, for which the MP-Editor will call this scoring-up script to provide the user with the score. The resulting score can be exported into a Mensural MEI score-based file (an MEI file encoding mensural notation in `<score>`). Moreover, this score can also be edited within the MP-Editor, allowing for editorial corrections of scribal errors. The scholar edition can also be exported as a Mensural MEI file, in both parts-based and score-based flavors.
 
