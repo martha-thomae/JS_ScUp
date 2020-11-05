@@ -434,7 +434,7 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
         // Getting the total of semibreves in the middle_notes
         minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
         count_Sb = minim_counter / (prolatio);
-        // console.log('No-dot\n');
+        console.log('No-dot\n');
     }
 
     // If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
@@ -442,7 +442,7 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
         // DOT OF PERFECTION
         dot_element = get_next_element(start_note);
         dot_element.setAttribute('form', 'perf');
-        // console.log('Perfection\n');
+        console.log('Dot of perfection\n');
         // Getting the total of semibreves in the middle_notes
         minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
         count_Sb = minim_counter / (prolatio);
@@ -450,13 +450,23 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
 
     // Otherwise, if the dot is in any middle note:
     else {
+        console.log('Dot in the middle of the sequence');
         first_dotted_note = sequence[first_dotted_note_index];////////////////////////////////////////
         dot_element = get_next_element(first_dotted_note);
-        if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug') {
-            // If the first dot is an already known dot of augmentation
-            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
-            count_Sb = minim_counter / (prolatio);
+        if (dot_element.hasAttribute('form')) {
+            if (dot_element.getAttribute('form') == 'aug') {
+                console.log('- I already knew about this AUG dot');
+                //If the first dot is an already known dot of augmentation
+                minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
+                count_Sb = minim_counter / (prolatio);
+            } else if (dot_element.getAttribute('form') == 'div') {
+                console.log('- I already knew about this DIV dot');
+                //If the first dot is an already known dot of division
+                minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+                count_Sb = minim_counter / (prolatio);
+            }
         } else {
+            console.log('- Is this dot new? Lets divide the sequence in two and find out if it is a div/aug dot');
             // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
             // Then count the number of semibreves in each of the two parts to discover if this 'dot' is a
             // 'dot of division' or a 'dot of addition'
@@ -481,11 +491,13 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
 
             // If there is just one semibreve before the first dot
             if (part1_count_Sb == 1) {
+                console.log('-- Potential dot of div/aug');
                 // Two possibilities: dot of division / dot of augmentation
                 // We have to use the results of the second part of the middle notes (part2_middle_notes) to figure this out
 
                 // If the number of semibreves after the dot is an integer number
                 if (part2_count_Sb == Math.floor(part2_count_Sb)) {
+                    console.log("--- Definitely a dot of division");
                     // DOT OF DIVISION
                     no_division_dot_flag = false;
                     // console.log('Imperfection app\n');
@@ -495,6 +507,7 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
                     modification(part1_count_Sb, start_note, part1_middle_notes, null, null, 'semibrevis', 'brevis');
                     modification(part2_count_Sb, null, part2_middle_notes, end_note, following_note, 'semibrevis', 'brevis');
                 } else {
+                     console.log("--- Definitely a dot of augmentation");
                     // DOT OF AUGMENTATION
                     // console.log('Augmentation_typeI\n');
                     dot_element.setAttribute('form', 'aug');
@@ -507,11 +520,14 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
 
             // If there is more than one semibreve before the first dot, it is impossible for that dot to be a 'dot of division'
             else {
+                console.log('-- Cannot be a dot of division (could be perf/aug)');
                 // DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
                 if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'perf') {
+                    console.log("--- Definitely a dot of perfection");
                     minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio);
                 }
                 else {
+                    console.log("--- Definitely a dot of augmentation");
                     // console.log('Augmentation_def\n');
                     dot_element.setAttribute('form', 'aug');
                     first_dotted_note.setAttribute('dur.quality', 'perfecta');
@@ -553,7 +569,7 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
         // Total of breves in the middle_notes
         minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
         count_B = minim_counter / (tempus * prolatio);
-        // console.log('No-dot\n');
+        console.log('No-dot\n');
     }
 
     // If first_dotted_note_index == 0, we have a dot at the start_note, which will make this note 'perfect' --> DOT OF PERFECTION. The other dots must be of augmentation (or perfection dots).
@@ -561,7 +577,7 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
         // DOT OF PERFECTION
         dot_element = get_next_element(start_note);
         dot_element.setAttribute('form', 'perf');
-        // console.log('Perfection\n');
+        console.log('Dot of perfection\n');
         // Total of breves in the middle_notes
         minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
         count_B = minim_counter / (tempus * prolatio);
@@ -569,13 +585,23 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
 
     // Otherwise, if the dot is in any middle note:
     else {
+        console.log('Dot in the middle of the sequence');
         first_dotted_note = sequence[first_dotted_note_index];////////////////////////////////////////
         dot_element = get_next_element(first_dotted_note);
-        if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'aug'){
-            //If the first dot is an already known dot of augmentation
-            minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
-            count_B = minim_counter / (tempus * prolatio);
+        if (dot_element.hasAttribute('form')) {
+            if (dot_element.getAttribute('form') == 'aug') {
+                console.log('- I already knew about this AUG dot');
+                //If the first dot is an already known dot of augmentation
+                minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
+                count_B = minim_counter / (tempus * prolatio);
+            } else if (dot_element.getAttribute('form') == 'div') {
+                console.log('- I already knew about this DIV dot');
+                //If the first dot is an already known dot of division
+                minim_counter = counting_minims_in_an_undotted_sequence(middle_notes, note_durs, undotted_note_gain);
+                count_B = minim_counter / (tempus * prolatio);
+            }
         } else {
+            console.log('- Is this dot new? Lets divide the sequence in two and find out if it is a div/aug dot');
             // We have to divide the sequence of middle_notes in 2 parts: before the dot, and after the dot.
             // Then count the number of breves in each of the two parts to discover if this 'dot' is a
             // 'dot of division' or a 'dot of addition'
@@ -598,11 +624,13 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
 
             // If there is just one breve before the first dot
             if (part1_count_B == 1) {
+                console.log('-- Potential dot of div/aug');
                 // Two possibilities: dot of division / dot of augmentation
                 // We have to take a look at the second part of the middle notes (part2_middle_notes) to figure this out
 
                 // If the number of breves after the dot is an integer number
                 if (part2_count_B == Math.floor(part2_count_B)) {
+                    console.log("--- Definitely a dot of division");
                     // DOT OF DIVISION
                     no_division_dot_flag = false;
                     // console.log('Imperfection app\n');
@@ -612,6 +640,7 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
                     modification(part1_count_B, start_note, part1_middle_notes, null, null, 'brevis', 'longa');
                     modification(part2_count_B, null, part2_middle_notes, end_note, following_note, 'brevis', 'longa');
                 } else {
+                    console.log("--- Definitely a dot of augmentation");
                     // DOT OF AUGMENTATION
                     // console.log('Augmentation_typeI\n');
                     dot_element.setAttribute('form', 'aug');
@@ -624,10 +653,13 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
 
             // If there is more than one breve before the first dot, it is impossible for that dot to be a 'dot of division'
             else {
+                console.log('-- Cannot be a dot of division (could be perf/aug)');
                 // DOT OF AUGMENTATION (or a dot of perfection at smaller note level)
                 if (dot_element.hasAttribute('form') && dot_element.getAttribute('form') == 'perf') {
+                    console.log("--- Definitely a dot of perfection");
                     minim_counter = counting_minims(middle_notes, note_durs, undotted_note_gain, dotted_note_gain, prolatio, tempus);
                 } else {
+                    console.log("--- Definitely a dot of augmentation");
                     // console.log('Augmentation_def\n');
                     dot_element.setAttribute('form', 'aug');
                     first_dotted_note.setAttribute('dur.quality', 'perfecta');
