@@ -358,19 +358,21 @@ const replace_ligatures_by_brackets = (meiDoc) => {
     const ligatures = Array.from(meiDoc.getElementsByTagName('ligature'));
     // Then, for each ligature
     for (var ligature of ligatures) {
-        // 1. Take the notes contained within that <ligature>
+        // 1. Take the elements contained within that <ligature>
         // and incorporate them into the stream of notes of the <layer>
         var parent = ligature.parentElement;
         var ligated_notes = Array.from(ligature.children);
-        for (var note of ligated_notes) {
-            parent.insertBefore(note, ligature);
+        for (var element of ligated_notes) {
+            parent.insertBefore(element, ligature);
         }
         // 2. And create the <bracketSpan> element to replace the ligature
         var bracketSpan = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'bracketSpan');
         bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
         // With @startid and @endid pointing to the start and end of the ligature
         var start_note = ligated_notes[0];
+        if (start_note.tagName == 'choice') {start_note = start_note.getElementsByTagName('corr')[0].children[0];}
         var end_note = ligated_notes[ligated_notes.length - 1];
+        if (end_note.tagName == 'choice') {end_note = end_note.getElementsByTagName('corr')[0].children[children.length - 1];}
         bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
         bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
         // And with attributes corresponding to a mensural ligature
