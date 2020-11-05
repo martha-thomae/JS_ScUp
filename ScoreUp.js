@@ -174,10 +174,10 @@ switch (notation){
         break;
     case "mensural.black":
         switch (style) {
-            case "Ars antiqua":
+            case "Ars_antiqua":
                 scoreDoc = ArsAntiqua.lining_up(quasiscoreDoc);
                 break;
-            case "Ars nova":
+            case "Ars_nova":
                 scoreDoc = ArsNova_and_WhiteMensural.lining_up(quasiscoreDoc);
                 break;
         }break;
@@ -186,7 +186,14 @@ switch (notation){
 PostProcess.replace_ligatures_by_brackets(scoreDoc);
 //PostProcess.remove_num_and_numbase(scoreDoc);
 
+// With modern clefs and with barlines both set to true
 var finalScoreDoc = PostProcess.refine_score(scoreDoc, true, true);
+// With modern clefs, but no barlines
+// var finalScoreDoc = PostProcess.refine_score(scoreDoc, true, false);
+// Keeping the original clefs, but including barlines
+// var finalScoreDoc = PostProcess.refine_score(scoreDoc, false, true);
+// Same as scoreDoc, original clefs and no barlines
+// var finalScoreDoc = PostProcess.refine_score(scoreDoc, false, false);
 
 const serializer = new XMLSerializer();
 const content = serializer.serializeToString(finalScoreDoc);
