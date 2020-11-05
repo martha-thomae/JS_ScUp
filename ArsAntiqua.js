@@ -518,9 +518,30 @@ const lining_up = quasiscore_mensural_doc => {
                 for (var child of element.children){
                     if (child.tagName == 'note' || child.tagName == 'rest') {
                         voice_noterest_dots_content.push(child);
-                    }
-                    else {
-                        console.log("This child of ligature is not a note/rest:");
+                    } else if (child.tagName == 'dot') {
+                        voice_noterest_dots_content.push(child);
+                        // Also encode the dot's functionality (i.e., division)
+                        child.setAttribute('form', 'div');
+                    } else if (child.tagName == 'choice') {
+                        // the relevant <note> and <rest> elements can be contained
+                        // within a <corr> element within a <ligature> due to editorial
+                        // corrections of parts of the ligature
+                        var corr = child.getElementsByTagName('corr')[0];
+                        for (var greatgrandchild of corr.children) {
+                            if (greatgrandchild.tagName == 'note' || greatgrandchild.tagName == 'rest') {
+                                voice_noterest_dots_content.push(greatgrandchild);
+                            } else if (greatgrandchild.tagName == 'dot') {
+                                voice_noterest_dots_content.push(greatgrandchild);
+                                // Also encode the dot's functionality (i.e., division)
+                                greatgrandchild.setAttribute('form', 'div');
+                            } else {
+                                console.log("This child of corr (within the choice tag in a ligature) is not a note/rest/dot:");
+                                console.log(greatgrandchild);
+                                console.log("It is a " + greatgrandchild.tagName);
+                            }
+                        }
+                    } else {
+                        console.log("This child of ligature is not a note/rest/dot/choice:");
                         console.log(child);
                         console.log("It is a " + child.tagName);
                     }
@@ -544,7 +565,7 @@ const lining_up = quasiscore_mensural_doc => {
                     }
                 }
             } else {
-                console.log("Unexpected tagnme : " + name + "\n(not a note, rest, dot, or ligature)\n");
+                console.log("Unexpected tagnme : " + name + "\n(not a note, rest, dot, ligature, or choice)\n");
             }
         }
         /*for (var member of voice_noterest_dots_content) {
