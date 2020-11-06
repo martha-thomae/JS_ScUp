@@ -370,9 +370,14 @@ const replace_ligatures_by_brackets = (meiDoc) => {
         bracketSpan.setAttribute('xml:id', ligature.getAttribute('xml:id'));
         // With @startid and @endid pointing to the start and end of the ligature
         var start_note = ligated_notes[0];
-        if (start_note.tagName == 'choice') {start_note = start_note.getElementsByTagName('corr')[0].children[0];}
+        if (start_note.tagName == 'choice') {
+            start_note = start_note.getElementsByTagName('corr')[0].children[0];
+        }
         var end_note = ligated_notes[ligated_notes.length - 1];
-        if (end_note.tagName == 'choice') {end_note = end_note.getElementsByTagName('corr')[0].children[children.length - 1];}
+        if (end_note.tagName == 'choice') {
+            var corr_children = end_note.getElementsByTagName('corr')[0].children;
+            end_note = corr_children[corr_children.length - 1];
+        }
         bracketSpan.setAttribute('startid', '#' + start_note.getAttribute('xml:id'));
         bracketSpan.setAttribute('endid', '#' + end_note.getAttribute('xml:id'));
         // And with attributes corresponding to a mensural ligature
