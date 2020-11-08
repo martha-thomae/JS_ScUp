@@ -276,7 +276,7 @@ function add_barlines(meiDoc){
                     seqNotesAndRests.push(element);
                     break;
                 case 'ligature':
-                    for (child of ligature.children) {
+                    for (child of element.children) {
                         switch(child.tagName) {
                             case 'note':
                                 seqNotesAndRests.push(child);
