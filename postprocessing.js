@@ -254,6 +254,7 @@ function add_sb_value(meiDoc) {
 }
 
 function add_barlines(meiDoc){
+    var corr, child, grandchild, greatgrandchild;
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
     var staves = meiDoc.getElementsByTagName('staff');
     var stavesDef = meiDoc.getElementsByTagName('staffDef');
@@ -275,7 +276,7 @@ function add_barlines(meiDoc){
                     seqNotesAndRests.push(element);
                     break;
                 case 'ligature':
-                    for (var child of ligature.children) {
+                    for (child of ligature.children) {
                         switch(child.tagName) {
                             case 'note':
                                 seqNotesAndRests.push(child);
@@ -283,8 +284,34 @@ function add_barlines(meiDoc){
                             case 'rest':
                                 seqNotesAndRests.push(child);
                                 break;
+                            case 'choice':
+                                corr = child.getElementsByTagName('corr')[0];
+                                for (greatgrandchild of corr.children) {
+                                    switch(greatgrandchild.tagName) {
+                                        case 'note':
+                                            seqNotesAndRests.push(greatgrandchild);
+                                            break;
+                                        case 'rest':
+                                            seqNotesAndRests.push(greatgrandchild);
+                                            break;
+                                    }
+                                    
+                                }
                         }
-                    }
+                    }break;
+                case 'choice':
+                    corr = element.getElementsByTagName('corr')[0];
+                    for (grandchild of corr.children) {
+                        switch(grandchild.tagName) {
+                            case 'note':
+                                seqNotesAndRests.push(grandchild);
+                                break;
+                            case 'rest':
+                                seqNotesAndRests.push(grandchild);
+                                break;
+                        }
+                    }break;
+
             }
         }
         // Determine the locations were barlines can be added
