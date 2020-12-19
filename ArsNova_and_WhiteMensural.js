@@ -6,7 +6,7 @@ const Fraction = require('fraction.js');
 
 // Functions about preceding and suceeding elements
 function get_next_element(target_element) {
-    return target_element.nextSibling;
+    return target_element.nextElementSibling;
 }
 
 function get_preceding_noterest(target_element) {
@@ -313,6 +313,7 @@ function minims_between_semibreves_processing(start_note, middle_notes, end_note
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
+    console.log('1st dotted note index:', first_dotted_note_index);
     var minim_counter, dot_element, first_dotted_note, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, dur, first_dotted_note_default_gain;
 
     // If first_dotted_note_index == -1, then there is no dot in the sequence at all
@@ -423,6 +424,7 @@ function sb_between_breves_processing(start_note, middle_notes, end_note, follow
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
+    console.log('1st dotted note index:', first_dotted_note_index);
     var dur, minim_counter, count_Sb, dot_element, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, part1_count_Sb, part2_count_Sb;
     var first_dotted_note, first_dotted_note_default_gain;
 
@@ -561,6 +563,7 @@ function breves_between_longas_processing(start_note, middle_notes, end_note, fo
     var no_division_dot_flag = true;    // Default value
     var sequence = [start_note].concat(middle_notes);
     var first_dotted_note_index = find_first_dotted_note(sequence);
+    console.log('1st dotted note index:', first_dotted_note_index);
     var dur, minim_counter, count_B, dot_element, part1_middle_notes, part2_middle_notes, minim_counter1, minim_counter2, part1_count_B, part2_count_B;
     var first_dotted_note, first_dotted_note_default_gain;
 
