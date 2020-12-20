@@ -210,10 +210,12 @@ function modification(counter, start_note, middle_notes, end_note, following_not
                         }
                     }
                     // Default case: Alteration
-                    console.log("Default Case:\tAlteration\n");
-                    last_uncolored_note.setAttribute('dur.quality', 'altera');
-                    last_uncolored_note.setAttribute('num', '1');
-                    last_uncolored_note.setAttribute('numbase', '2');
+                    else {
+                        console.log("Default Case:\tAlteration\n");
+                        last_uncolored_note.setAttribute('dur.quality', 'altera');
+                        last_uncolored_note.setAttribute('num', '1');
+                        last_uncolored_note.setAttribute('numbase', '2');
+                    }
                 }
 
                 else if ((start_note != null && start_note.tagName == 'note' && start_note.getAttribute('dur') == long_note && !(has_been_modified(start_note)) && !(followed_by_dot(start_note))) && (end_note != null && end_note.tagName == 'note' && end_note.getAttribute('dur') == long_note && !(has_been_modified(end_note)) && !(followed_by_dot(end_note)))) {
