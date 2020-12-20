@@ -10,9 +10,9 @@ function get_next_element(target_element) {
 }
 
 function get_preceding_noterest(target_element) {
-    var preceding_element = target_element.previousSibling;
+    var preceding_element = target_element.previousElementSibling;
     while (preceding_element.tagName != 'note' && preceding_element.tagName != 'rest'){
-        preceding_element = preceding_element.previousSibling;
+        preceding_element = preceding_element.previousElementSibling;
     } return preceding_element;
 }
 

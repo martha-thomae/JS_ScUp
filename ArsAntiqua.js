@@ -19,23 +19,23 @@ const Fraction = require('fraction.js');
 
 // Functions about preceding and following note/rest elements
 function get_preceding_noterest(target_element) {
-    var preceding_element = target_element.previousSibling;
+    var preceding_element = target_element.previousElementSibling;
     while (preceding_element.tagName != 'note' && preceding_element.tagName != 'rest'){
-        preceding_element = preceding_element.previousSibling;
+        preceding_element = preceding_element.previousElementSibling;
     } return preceding_element;
 }
 
 function get_following_noterest(target_element) {
-    var following_element = target_element.nextSibling;
+    var following_element = target_element.nextElementSibling;
     while (following_element.tagName != 'note' && following_element.tagName != 'rest'){
-        following_element = following_element.nextSibling;
+        following_element = following_element.nextElementSibling;
     } return following_element;
 }
 
 // Functions related to dots
 function followed_by_dot(target_element) {
     // Boolean function evaluating the condition 'followed by dot'
-    var next_element = target_element.nextSibling;
+    var next_element = target_element.nextElementSibling;
     if (next_element != null && next_element.tagName == 'dot') {
         return true;
     } else {
