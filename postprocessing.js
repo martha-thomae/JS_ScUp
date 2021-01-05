@@ -370,7 +370,7 @@ function add_barlines(meiDoc, bar_by_note){
 const refine_score = (scoreDoc, switch_to_modern_clefs_flag, bar_by_note_value) => {
     if (switch_to_modern_clefs_flag) {
         mensural_to_modern_clefs(scoreDoc);
-    }
+    }// else, we stay with the original (mensural) clefs of the parts MEI file
     switch(bar_by_note_value) {
         case "None":
             break;
