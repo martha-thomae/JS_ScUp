@@ -1,10 +1,13 @@
 /*
     OPTIONAL POST-PROCESSING
 
-    Post-processing methods (to be selected by the user), including:
-    - Change to modern clefs
-    - Barring of the piece by the long by adding dotted barlines
+    Post-processing functions (to be selected by the user), including:
+    A) Change to modern clefs
+    B) Barring of the piece with dotted barlines using a user-selected note value
 */
+
+
+// A) Clef-related functions: mensural_to_modern_clefs
 
 function mensural_to_modern_clefs(meiDoc) {
     const stavesDef = Array.from(meiDoc.getElementsByTagName('staffDef'));
@@ -82,6 +85,9 @@ function mensural_to_modern_clefs(meiDoc) {
         parent.removeChild(clef);
     }
 }
+
+
+// B) Barring-related functions: add_sb_value & add_barlines
 
 function add_sb_value(meiDoc) {
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
@@ -253,7 +259,7 @@ function add_sb_value(meiDoc) {
     }
 }
 
-function add_barlines(meiDoc){
+function add_barlines(meiDoc, bar_by_note){
     var corr, child, grandchild, greatgrandchild;
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
     var staves = meiDoc.getElementsByTagName('staff');
@@ -317,13 +323,23 @@ function add_barlines(meiDoc){
         // Determine the locations were barlines can be added
         // This is, where the note offset coincides with the bar-length
         // 1. Define the bar-length to be the length of a longa (in semibreves)
+        var barLength_Sb;
         var modusminor = staffDef_mensur.getAttribute('modusminor');
         var tempus = staffDef_mensur.getAttribute('tempus');
         var prolatio = staffDef_mensur.getAttribute('prolatio');
         if (tempus == null){tempus = 3;}
         if (prolatio == null){prolatio = 3;}
-        var barLength_Sb = modusminor * tempus;
-        console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength_Sb + ' Sb');
+        switch(bar_by_note) {
+            case "semibrevis":
+                barLength_Sb = 1;
+                break;
+            case "brevis":
+                barLength_Sb = tempus;
+                break;
+            case "longa":
+                barLength_Sb = modusminor * tempus;
+                break;
+        }console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength_Sb + ' Sb');
         // 2. Add the barlines where the accumulated value of the notes (in semibreves,
         // as can be found using the @sb_value added in the 'add_sb_value' function) is
         // equal to the bar-length.
@@ -347,29 +363,34 @@ function add_barlines(meiDoc){
 }
 
 /*
-    Refine score by improving readability by modern musicians
-    (switching the clefs into CMN and barring the piece) as indicated by the user
+    Refine Score: User selection of the post-processing methods
+    (switch to modern clefs and barring of the piece)
+    to improve readibility for modern musicians
 */
-const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
+const refine_score = (scoreDoc, switch_to_modern_clefs_flag, bar_by_note_value) => {
     if (switch_to_modern_clefs_flag) {
         mensural_to_modern_clefs(scoreDoc);
     }
-    if (add_bars_flag) {
-        // Calculate the values of all notes in semibreves (add_sb_value)
-        // to determine the place where barlines should be added (add_barlines)
-        add_sb_value(scoreDoc);
-        add_barlines(scoreDoc);
-        // Remove the 'sb_value' attribute for producing a valid file
-        for (var layer of scoreDoc.getElementsByTagName('layer')) {
-            for (var element of layer.children) {
-                element.removeAttribute('sb_value');
+    switch(bar_by_note_value) {
+        case "None":
+            break;
+        default:
+            // Calculate the values of all notes in semibreves (add_sb_value)
+            // to determine the place where barlines should be added (add_barlines)
+            add_sb_value(scoreDoc);
+            add_barlines(scoreDoc, bar_by_note_value);
+            // Remove the 'sb_value' attribute for producing a valid file
+            for (var layer of scoreDoc.getElementsByTagName('layer')) {
+                for (var element of layer.children) {
+                    element.removeAttribute('sb_value');
+                }
             }
-        }
     }
     return scoreDoc;
 };
 
 exports.refine_score = refine_score;
+
 
 /*
     REQUIRED POST-PROCESSING:
