@@ -1,10 +1,13 @@
 /*
     OPTIONAL POST-PROCESSING
 
-    Post-processing methods (to be selected by the user), including:
-    - Change to modern clefs
-    - Barring of the piece by the long by adding dotted barlines
+    Post-processing functions (to be selected by the user), including:
+    A) Change to modern clefs
+    B) Barring of the piece with dotted barlines using a user-selected note value
 */
+
+
+// A) Clef-related functions: mensural_to_modern_clefs
 
 function mensural_to_modern_clefs(meiDoc) {
     const stavesDef = Array.from(meiDoc.getElementsByTagName('staffDef'));
@@ -82,6 +85,9 @@ function mensural_to_modern_clefs(meiDoc) {
         parent.removeChild(clef);
     }
 }
+
+
+// B) Barring-related functions: add_sb_value & add_barlines (and its auxiliary function 'insert_after')
 
 function add_sb_value(meiDoc) {
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
@@ -253,7 +259,36 @@ function add_sb_value(meiDoc) {
     }
 }
 
-function add_barlines(meiDoc){
+function insert_after(new_element, some_element) {
+    // Inserts the new_element after the some_element
+    // A) either as its next sibling by using parent.insertBefore(next_element, nextsibling)
+    // or parent.appendChild(new_element), depending on the position of the some_element
+    // B) or the next sibling of its parent in case we are at the end of a 'corr' element
+    var nextsibling = some_element.nextElementSibling;
+    var parent = some_element.parentElement;
+    var choice_element;
+    if (nextsibling == null) {
+        // If there is no following sibling, then we are at the last child
+        // Therefore, we append the new_element at the end (see 'else')
+        // except if we are inside a 'corr' element, then we insert it after its 'choice' parent
+        if (parent.tagName == "corr") {
+            choice_element = parent.parentElement;
+            insert_after(new_element, choice_element);
+        } else {
+            parent.appendChild(new_element);
+        }
+    } else {
+        // If there is a following sibling, we insert the new_element before it (see 'else')
+        // except if there is a dot, then we insert the new_element after the dot
+        if (nextsibling.tagName == "dot") {
+            insert_after(new_element, nextsibling);
+        } else {
+            parent.insertBefore(new_element, nextsibling);
+        }
+    }
+}
+
+function add_barlines(meiDoc, bar_by_note){
     var corr, child, grandchild, greatgrandchild;
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
     var staves = meiDoc.getElementsByTagName('staff');
@@ -317,13 +352,23 @@ function add_barlines(meiDoc){
         // Determine the locations were barlines can be added
         // This is, where the note offset coincides with the bar-length
         // 1. Define the bar-length to be the length of a longa (in semibreves)
+        var barLength_Sb;
         var modusminor = staffDef_mensur.getAttribute('modusminor');
         var tempus = staffDef_mensur.getAttribute('tempus');
         var prolatio = staffDef_mensur.getAttribute('prolatio');
         if (tempus == null){tempus = 3;}
         if (prolatio == null){prolatio = 3;}
-        var barLength_Sb = modusminor * tempus;
-        console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength_Sb + ' Sb');
+        switch(bar_by_note) {
+            case "semibrevis":
+                barLength_Sb = 1;
+                break;
+            case "brevis":
+                barLength_Sb = tempus;
+                break;
+            case "longa":
+                barLength_Sb = modusminor * tempus;
+                break;
+        }console.log('\nVoice # ' + (i + 1) + ': bar-length = ' + barLength_Sb + ' Sb');
         // 2. Add the barlines where the accumulated value of the notes (in semibreves,
         // as can be found using the @sb_value added in the 'add_sb_value' function) is
         // equal to the bar-length.
@@ -337,9 +382,11 @@ function add_barlines(meiDoc){
             // we are substitutin the original condition by checking that
             // the division by the barlength provides a number close to an integer
             if (Math.abs((accum / barLength_Sb) - Math.round(accum / barLength_Sb)) < 0.00001){
+                // Create dotted <barLine> element
                 var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
-                staff_layer.insertBefore(barline, noterest.nextSibling);
+                // Insert the new <barLine> element after the noterest
+                insert_after(barline, noterest);
                 console.log('---- barline ----');
             }
         }
@@ -347,29 +394,35 @@ function add_barlines(meiDoc){
 }
 
 /*
-    Refine score by improving readability by modern musicians
-    (switching the clefs into CMN and barring the piece) as indicated by the user
+    Refine Score: User selection of the post-processing methods
+    (switch to modern clefs and barring of the piece)
+    to improve readibility for modern musicians
 */
-const refine_score = (scoreDoc, switch_to_modern_clefs_flag, add_bars_flag) => {
+const refine_score = (scoreDoc, switch_to_modern_clefs_flag, bar_by_note_value) => {
     if (switch_to_modern_clefs_flag) {
         mensural_to_modern_clefs(scoreDoc);
-    }
-    if (add_bars_flag) {
-        // Calculate the values of all notes in semibreves (add_sb_value)
-        // to determine the place where barlines should be added (add_barlines)
-        add_sb_value(scoreDoc);
-        add_barlines(scoreDoc);
-        // Remove the 'sb_value' attribute for producing a valid file
-        for (var layer of scoreDoc.getElementsByTagName('layer')) {
-            for (var element of layer.children) {
-                element.removeAttribute('sb_value');
+    }// else, we stay with the original (mensural) clefs of the parts MEI file
+    switch(bar_by_note_value) {
+        case "None":
+            break;
+        default:
+            // Calculate the values of all notes in semibreves (add_sb_value)
+            // to determine the place where barlines should be added (add_barlines)
+            add_sb_value(scoreDoc);
+            add_barlines(scoreDoc, bar_by_note_value);
+            // Remove the 'sb_value' attribute for producing a valid file
+            for (var note of scoreDoc.getElementsByTagName('note')) {
+                note.removeAttribute('sb_value');
             }
-        }
+            for (var rest of scoreDoc.getElementsByTagName('rest')) {
+                rest.removeAttribute('sb_value');
+            }
     }
     return scoreDoc;
 };
 
 exports.refine_score = refine_score;
+
 
 /*
     REQUIRED POST-PROCESSING:
