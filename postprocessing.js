@@ -411,10 +411,11 @@ const refine_score = (scoreDoc, switch_to_modern_clefs_flag, bar_by_note_value) 
             add_sb_value(scoreDoc);
             add_barlines(scoreDoc, bar_by_note_value);
             // Remove the 'sb_value' attribute for producing a valid file
-            for (var layer of scoreDoc.getElementsByTagName('layer')) {
-                for (var element of layer.children) {
-                    element.removeAttribute('sb_value');
-                }
+            for (var note of scoreDoc.getElementsByTagName('note')) {
+                note.removeAttribute('sb_value');
+            }
+            for (var rest of scoreDoc.getElementsByTagName('rest')) {
+                rest.removeAttribute('sb_value');
             }
     }
     return scoreDoc;
