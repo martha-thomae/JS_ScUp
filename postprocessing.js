@@ -87,7 +87,7 @@ function mensural_to_modern_clefs(meiDoc) {
 }
 
 
-// B) Barring-related functions: add_sb_value & add_barlines
+// B) Barring-related functions: add_sb_value & add_barlines (and its auxiliary function 'insert_after')
 
 function add_sb_value(meiDoc) {
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
@@ -259,6 +259,35 @@ function add_sb_value(meiDoc) {
     }
 }
 
+function insert_after(new_element, some_element) {
+    // Inserts the new_element after the some_element
+    // A) either as its next sibling by using parent.insertBefore(next_element, nextsibling)
+    // or parent.appendChild(new_element), depending on the position of the some_element
+    // B) or the next sibling of its parent in case we are at the end of a 'corr' element
+    var nextsibling = some_element.nextElementSibling;
+    var parent = some_element.parentElement;
+    var choice_element;
+    if (nextsibling == null) {
+        // If there is no following sibling, then we are at the last child
+        // Therefore, we append the new_element at the end (see 'else')
+        // except if we are inside a 'corr' element, then we insert it after its 'choice' parent
+        if (parent.tagName == "corr") {
+            choice_element = parent.parentElement;
+            insert_after(new_element, choice_element);
+        } else {
+            parent.appendChild(new_element);
+        }
+    } else {
+        // If there is a following sibling, we insert the new_element before it (see 'else')
+        // except if there is a dot, then we insert the new_element after the dot
+        if (nextsibling.tagName == "dot") {
+            insert_after(new_element, nextsibling);
+        } else {
+            parent.insertBefore(new_element, nextsibling);
+        }
+    }
+}
+
 function add_barlines(meiDoc, bar_by_note){
     var corr, child, grandchild, greatgrandchild;
     // Retrieve all the voices (<staff> elements) and their metadata (<staffDef>)
@@ -356,31 +385,8 @@ function add_barlines(meiDoc, bar_by_note){
                 // Create dotted <barLine> element
                 var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
-                // Find the right position to add the new <barLine> element
-                // (before the next sibling of the current noterest, if this next sibling exists)
-                var nextsibling = noterest.nextElementSibling;
-                var parent = noterest.parentElement;
-                if (nextsibling == null){
-                    // if there is no following sibling (we are at the last child),
-                    // we append the barline at the end
-                    parent.appendChild(barline);
-                } else {
-                    // if there is a following sibling, we insert the barline before it (see 'else')
-                    // except if there is a dot, then we add it after the dot
-                    // (this is, before the next element, if there is one
-                    // or append it as a last child, if there is none)
-                    if (nextsibling.tagName == 'dot') {
-                        nextsibling = nextsibling.nextElementSibling;
-                        if (nextsibling == null){
-                            parent.appendChild(barline);
-                        } else {
-                            parent.insertBefore(barline, nextsibling);
-                        }
-                    } else {
-                        parent.insertBefore(barline, nextsibling);
-                    }
-                }
-                //noterest.parentElement.insertBefore(barline, noterest.nextElementSibling);
+                // Insert the new <barLine> element after the noterest
+                insert_after(barline, noterest);
                 console.log('---- barline ----');
             }
         }
