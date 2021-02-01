@@ -365,8 +365,20 @@ function add_barlines(meiDoc, bar_by_note){
                     // we append the barline at the end
                     parent.appendChild(barline);
                 } else {
-                    // if there is a following sibling, we insert the barline before it
-                    parent.insertBefore(barline, nextsibling);
+                    // if there is a following sibling, we insert the barline before it (see 'else')
+                    // except if there is a dot, then we add it after the dot
+                    // (this is, before the next element, if there is one
+                    // or append it as a last child, if there is none)
+                    if (nextsibling.tagName == 'dot') {
+                        nextsibling = nextsibling.nextElementSibling;
+                        if (nextsibling == null){
+                            parent.appendChild(barline);
+                        } else {
+                            parent.insertBefore(barline, nextsibling);
+                        }
+                    } else {
+                        parent.insertBefore(barline, nextsibling);
+                    }
                 }
                 //noterest.parentElement.insertBefore(barline, noterest.nextElementSibling);
                 console.log('---- barline ----');
