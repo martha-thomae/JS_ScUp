@@ -353,9 +353,22 @@ function add_barlines(meiDoc, bar_by_note){
             // we are substitutin the original condition by checking that
             // the division by the barlength provides a number close to an integer
             if (Math.abs((accum / barLength_Sb) - Math.round(accum / barLength_Sb)) < 0.00001){
+                // Create dotted <barLine> element
                 var barline = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'barLine');
                 barline.setAttribute('form', 'dashed');
-                staff_layer.insertBefore(barline, noterest.nextSibling);
+                // Find the right position to add the new <barLine> element
+                // (before the next sibling of the current noterest, if this next sibling exists)
+                var nextsibling = noterest.nextElementSibling;
+                var parent = noterest.parentElement;
+                if (nextsibling == null){
+                    // if there is no following sibling (we are at the last child),
+                    // we append the barline at the end
+                    parent.appendChild(barline);
+                } else {
+                    // if there is a following sibling, we insert the barline before it
+                    parent.insertBefore(barline, nextsibling);
+                }
+                //noterest.parentElement.insertBefore(barline, noterest.nextElementSibling);
                 console.log('---- barline ----');
             }
         }
