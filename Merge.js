@@ -186,7 +186,7 @@ const merge = meiDoc => {
         // Add <label> as a child of <staffDef> to include the voice type as text
         var label = meiDoc.createElementNS('http://www.music-encoding.org/ns/mei', 'label');
         label.textContent = staffDef.getAttribute('label');
-        staffDef.appendChild(label);
+        staffDef.insertBefore(label, staffDef.children[0]);
         // And remove the corresponding @label attribute from <staffDef>
         // (the value of @label does not get rendered in Verovio)
         staffDef.removeAttribute('label');
