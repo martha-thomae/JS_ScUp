@@ -64,16 +64,12 @@ function mensural_to_modern_clefs(meiDoc) {
                 staffDef.setAttribute('clef.dis.place', 'below');
                 break;
             case 'F4':
-                staffDef.setAttribute('clef.shape', 'G');
-                staffDef.setAttribute('clef.line', '2');
-                staffDef.setAttribute('clef.dis', '8');
-                staffDef.setAttribute('clef.dis.place', 'below');
+                staffDef.setAttribute('clef.shape', 'F');
+                staffDef.setAttribute('clef.line', '4');
                 break;
             case 'F5':
-                staffDef.setAttribute('clef.shape', 'G');
-                staffDef.setAttribute('clef.line', '2');
-                staffDef.setAttribute('clef.dis', '8');
-                staffDef.setAttribute('clef.dis.place', 'below');
+                staffDef.setAttribute('clef.shape', 'F');
+                staffDef.setAttribute('clef.line', '4');
                 break;
         }
     }
